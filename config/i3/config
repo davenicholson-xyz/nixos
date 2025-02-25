@@ -62,7 +62,7 @@ tiling_drag modifier titlebar
 # start a terminal
 bindsym $mod+Return exec kitty 
 bindsym $mod+b exec google-chrome-stable
-bindsym $mod+W exec /home/dave/.cargo/bin/wallheaven -c wallpaper
+bindsym $mod+Shift+w exec /home/dave/.cargo/bin/wallheaven -c wallpaper
 
 bindsym $mod+Shift+q kill
 

@@ -20,7 +20,10 @@
 
   home.packages = with pkgs; [
   	google-chrome
+
   	helix
+    tree
+    lazygit
 
     feh
   ];
@@ -35,6 +38,11 @@
     "/home/dave/.local/bin"
     "/home/dave/.cargo/bin"
   ];
+
+   programs.direnv = {
+      enable = true;
+      # silent = true;
+  };
 
   nixpkgs.config.allowUnfree = true;
   programs.home-manager.enable = true;
