@@ -29,7 +29,5 @@
     };
 
   environment.systemPackages = with pkgs; [
-    # bumblebee-status
-    (bumblebee-status.override{plugins = p:[p.cpu p.datetime p.memory p.nic];})
-  ];
+ ];
 }

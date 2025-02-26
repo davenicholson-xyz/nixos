@@ -28,7 +28,8 @@ gaps inner 6
 # https://wiki.archlinux.org/index.php/XDG_Autostart
 exec --no-startup-id dex --autostart --environment i3
 
-exec --no-startup-id xrandr --output Virtual-1 --mode 1920x1080
+exec --no-startup-id xrandr --output Virtual-1 --mode 1440x900
+# exec --no-startup-id xrandr --output Virtual-1 --mode 1920x1080
 exec --no-startup-id /home/dave/.fehbg
 exec --no-startup-id picom --backend xrender -b
 

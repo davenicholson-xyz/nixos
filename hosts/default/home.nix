@@ -23,7 +23,9 @@
 
   	helix
     tree
+    yazi
     lazygit
+    trash-cli
 
     feh
   ];
