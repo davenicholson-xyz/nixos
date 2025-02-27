@@ -16,10 +16,10 @@
 
   home.packages = with pkgs; [
   	helix
-    # tree
-    # yazi
-    # lazygit
-    # trash-cli
+    tree
+    yazi
+    lazygit
+    trash-cli
   ];
 
   home.sessionVariables = {
@@ -27,8 +27,8 @@
   };
 
   home.sessionPath = [
-    "/home/dave/.local/bin"
-    "/home/dave/.cargo/bin"
+    # "/home/dave/.local/bin"
+    # "/home/dave/.cargo/bin"
   ];
 
   nixpkgs.config.allowUnfree = true;

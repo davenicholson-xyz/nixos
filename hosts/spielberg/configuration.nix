@@ -20,8 +20,10 @@
       }];
     };
 
+    # IP of router
     defaultGateway = "172.16.0.1";
-    nameservers = [ "172.16.0.10" ];
+    # IP of DNS
+    nameservers = [ "172.16.0.9" ];
   };
 
   networking.networkmanager.enable = true;
@@ -116,6 +118,7 @@
 
   services.sonarr= {
     enable = true;
+    user = "dave";
   };
 
   security.sudo = {
@@ -135,5 +138,8 @@
   networking.firewall.enable = false;
 
   system.stateVersion = "24.11"; # Did you read the comment?
+
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
 
 }
