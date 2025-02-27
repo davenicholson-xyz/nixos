@@ -12,6 +12,7 @@
 
 	outputs = { self, nixpkgs, ... }@inputs: {
 		nixosConfigurations = {
+
 			default = nixpkgs.lib.nixosSystem {
 				specialArgs = {inherit inputs;};
 				modules = [
@@ -19,6 +20,15 @@
 						inputs.home-manager.nixosModules.default
 				];
 			};
+
+			spielberg = nixpkgs.lib.nixosSystem {
+				specialArgs = {inherit inputs;};
+				modules = [
+					./hosts/spielberg/configuration.nix
+						inputs.home-manager.nixosModules.default
+				];
+			};
+
 		};
 	};
 }

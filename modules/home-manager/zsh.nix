@@ -2,7 +2,7 @@
 
 let
   aliases = {
-   ns = "sudo nixos-rebuild switch --flake /home/dave/nixos#default";
+   ns = "sudo nixos-rebuild switch --flake /home/dave/nixos#spielberg";
 };
 in
 {
