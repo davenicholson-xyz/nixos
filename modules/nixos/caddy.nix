@@ -12,8 +12,8 @@
       reverse_proxy 172.16.164.62:3000
     '';
 
-    virtualHosts."pihole.lodgeserver.net".extraConfig = ''
-      reverse_proxy 172.16.0.10
+    virtualHosts."adblock.lodgeserver.net".extraConfig = ''
+      reverse_proxy 172.16.0.9
     '';
 
     virtualHosts."plex.lodgeserver.net".extraConfig = ''
@@ -26,6 +26,14 @@
 
     virtualHosts."proxmox.lodgeserver.net".extraConfig = ''
       reverse_proxy 172.16.69.40:8006
+    '';
+
+    virtualHosts."wireguard.lodgeserver.net".extraConfig = ''
+      reverse_proxy 172.16.0.10:51821
+    '';
+
+    virtualHosts."omv.lodgeserver.net".extraConfig = ''
+      reverse_proxy 172.16.69.69:80
     '';
 
     virtualHosts."http://cameras.lodgeserver.net".extraConfig = ''

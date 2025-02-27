@@ -19,6 +19,7 @@
     tree
     yazi
     lazygit
+    lazydocker
     trash-cli
   ];
 
@@ -27,11 +28,14 @@
   };
 
   home.sessionPath = [
-    # "/home/dave/.local/bin"
-    # "/home/dave/.cargo/bin"
+    "/home/dave/.local/bin"
+    "/home/dave/.cargo/bin"
   ];
 
   nixpkgs.config.allowUnfree = true;
+
+  programs.zsh.enable = true;
+
   programs.home-manager.enable = true;
 
 }
