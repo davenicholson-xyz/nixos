@@ -4,11 +4,13 @@
   imports =
     [ 
       ./hardware-configuration.nix
-    ];
 
-  boot.loader.grub.enable = true;
-  boot.loader.grub.device = "/dev/sda";
-  boot.loader.grub.useOSProber = true;
+      ../../modules/nixos/boot.nix
+      ../../modules/nixos/locale.nix
+
+      ../../modules/nixos/caddy.nix
+      ../../modules/nixos/docker.nix
+    ];
 
   networking = {
     hostName = "spielberg";
@@ -20,9 +22,7 @@
       }];
     };
 
-    # IP of router
     defaultGateway = "172.16.0.1";
-    # IP of DNS
     nameservers = [ "172.16.0.9" ];
   };
 
@@ -37,33 +37,10 @@
     fsType = "nfs";
   };
   
-  time.timeZone = "Europe/London";
-
-  i18n.defaultLocale = "en_GB.UTF-8";
-
-  i18n.extraLocaleSettings = {
-    LC_ADDRESS = "en_GB.UTF-8";
-    LC_IDENTIFICATION = "en_GB.UTF-8";
-    LC_MEASUREMENT = "en_GB.UTF-8";
-    LC_MONETARY = "en_GB.UTF-8";
-    LC_NAME = "en_GB.UTF-8";
-    LC_NUMERIC = "en_GB.UTF-8";
-    LC_PAPER = "en_GB.UTF-8";
-    LC_TELEPHONE = "en_GB.UTF-8";
-    LC_TIME = "en_GB.UTF-8";
-  };
-
-  services.xserver.xkb = {
-    layout = "gb";
-    variant = "";
-  };
-
-  console.keyMap = "uk";
-
   users.users.dave = {
     isNormalUser = true;
     description = "Dave";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" "docker" ];
     packages = with pkgs; [];
   };
 
@@ -73,34 +50,6 @@
 
   environment.systemPackages = with pkgs; [
   ];
-
-  services.caddy = {
-    enable = true;
-
-    virtualHosts."www.lodgeserver.net".extraConfig = ''
-      redir https://lodgeserver.net{uri}
-    '';
-
-    virtualHosts."homepage.lodgeserver.net".extraConfig = ''
-      reverse_proxy 172.16.164.62:3000
-    '';
-
-    virtualHosts."pihole.lodgeserver.net".extraConfig = ''
-      reverse_proxy 172.16.0.10
-    '';
-
-    virtualHosts."plex.lodgeserver.net".extraConfig = ''
-      reverse_proxy 172.16.245.192.32400
-    '';
-
-    virtualHosts."qbittorrent.lodgeserver.net".extraConfig = ''
-      reverse_proxy 172.16.78.192.8080 
-    '';
-
-    virtualHosts."proxmox.lodgeserver.net".extraConfig = ''
-      reverse_proxy 172.16.69.40:8006
-    '';
-  };
 
   # services.flaresolverr = {
   #   enable = true;
@@ -140,6 +89,5 @@
   system.stateVersion = "24.11"; # Did you read the comment?
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
-
 
 }
