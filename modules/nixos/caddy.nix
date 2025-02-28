@@ -9,7 +9,7 @@
     '';
 
     virtualHosts."homepage.lodgeserver.net".extraConfig = ''
-      reverse_proxy 172.16.164.62:3000
+      reverse_proxy 172.16.1.21:3000
     '';
 
     virtualHosts."adblock.lodgeserver.net".extraConfig = ''
@@ -17,7 +17,7 @@
     '';
 
     virtualHosts."plex.lodgeserver.net".extraConfig = ''
-      reverse_proxy 172.16.245.192:32400
+      reverse_proxy 172.16.1.23:32400
     '';
 
     virtualHosts."qbittorrent.lodgeserver.net".extraConfig = ''
