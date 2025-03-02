@@ -48,6 +48,7 @@
     isNormalUser = true;
     description = "Dave";
     extraGroups = [ "networkmanager" "wheel" "docker" ];
+    
     packages = with pkgs; [
       compose2nix
       screen
@@ -56,7 +57,12 @@
     ];
   };
 
+  programs.zsh.enable = true;
+  users.users.dave.shell = pkgs.zsh;
+
   services.getty.autologinUser = "dave";
+
+  services.qemuGuest.enable = true;
 
   nixpkgs.config.allowUnfree = true;
 
