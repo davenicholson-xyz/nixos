@@ -4,15 +4,15 @@
   services.caddy = {
     enable = true;
 
-    virtualHosts."www.lodgeserver.net".extraConfig = ''
-      redir https://lodgeserver.net{uri}
+    # virtualHosts."www.lodgeserver.net".extraConfig = ''
+    #   redir https://lodgeserver.net{uri}
+    # '';
+
+    virtualHosts."dashboard.lodgeserver.net".extraConfig = ''
+      reverse_proxy localhost:3000
     '';
 
-    virtualHosts."homepage.lodgeserver.net".extraConfig = ''
-      reverse_proxy 172.16.1.21:3000
-    '';
-
-    virtualHosts."adblock.lodgeserver.net".extraConfig = ''
+    virtualHosts."adguard.lodgeserver.net".extraConfig = ''
       reverse_proxy 172.16.0.9
     '';
 
@@ -21,7 +21,19 @@
     '';
 
     virtualHosts."qbittorrent.lodgeserver.net".extraConfig = ''
-      reverse_proxy 172.16.78.192:8080 
+      reverse_proxy localhost:8080 
+    '';
+
+    virtualHosts."prowlarr.lodgeserver.net".extraConfig = ''
+      reverse_proxy localhost:9696
+    '';
+
+    virtualHosts."radarr.lodgeserver.net".extraConfig = ''
+      reverse_proxy localhost:7878
+    '';
+
+    virtualHosts."sonarr.lodgeserver.net".extraConfig = ''
+      reverse_proxy localhost:8989
     '';
 
     virtualHosts."proxmox.lodgeserver.net".extraConfig = ''
@@ -29,16 +41,13 @@
     '';
 
     virtualHosts."wireguard.lodgeserver.net".extraConfig = ''
-      reverse_proxy 172.16.0.10:51821
+      reverse_proxy localhost:51821
     '';
 
     virtualHosts."omv.lodgeserver.net".extraConfig = ''
       reverse_proxy 172.16.69.69:80
     '';
 
-    virtualHosts."http://cameras.lodgeserver.net".extraConfig = ''
-      reverse_proxy 172.16.157.19:8090
-    '';
   };
 
 }

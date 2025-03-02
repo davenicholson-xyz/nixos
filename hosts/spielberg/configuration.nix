@@ -9,7 +9,14 @@
       ../../modules/nixos/locale.nix
 
       ../../modules/nixos/caddy.nix
-      ../../modules/nixos/docker.nix
+
+      # ../../modules/nixos/torrents.nix
+      # ../../modules/nixos/vpn_network.nix
+
+      ../../docker/network/docker-compose.nix
+      ../../docker/torrent/docker-compose.nix
+      ../../docker/indexers/docker-compose.nix
+      ../../docker/dashboard/docker-compose.nix
     ];
 
   networking = {
@@ -41,7 +48,12 @@
     isNormalUser = true;
     description = "Dave";
     extraGroups = [ "networkmanager" "wheel" "docker" ];
-    packages = with pkgs; [];
+    packages = with pkgs; [
+      compose2nix
+      screen
+      iproute2
+      btop
+    ];
   };
 
   services.getty.autologinUser = "dave";
@@ -51,23 +63,21 @@
   environment.systemPackages = with pkgs; [
   ];
 
-  # services.flaresolverr = {
-  #   enable = true;
-  #   port = 8191;
-  # };
-
   services.prowlarr = {
     enable = true;
+    openFirewall = true;
   };
 
   services.radarr = {
     enable = true;
     user = "dave";
+    openFirewall = true;
   };
 
   services.sonarr= {
     enable = true;
     user = "dave";
+    openFirewall = true;
   };
 
   security.sudo = {
@@ -84,7 +94,9 @@
 
   services.openssh.enable = true;
 
-  networking.firewall.enable = false;
+  networking.firewall = {
+    enable = false;
+  };
 
   system.stateVersion = "24.11"; # Did you read the comment?
 
