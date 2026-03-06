@@ -87,20 +87,49 @@ PanelWindow {
             Rectangle {
                 color: root.colPill
                 radius: 12
-                width: clock.width + 16
-                height: clock.height + 8
+                width: clockRow.width + 16
+                height: clockRow.height + 8
 
-                Text {
-                    id: clock
+                Row {
+                    id: clockRow
                     anchors.centerIn: parent
-                    color: root.colClock
-                    font { family: root.fontFamily; pixelSize: root.fontSize - 2; bold: true }
-                    text: Qt.formatDateTime(new Date(), "HH:mm")
-                    Timer {
-                        interval: 1000
-                        running: true
-                        repeat: true
-                        onTriggered: clock.text = Qt.formatDateTime(new Date(), "HH:mm")
+                    spacing: 5
+
+                    Item {
+                        width: 13; height: 13
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        Image {
+                            id: clockIcon
+                            anchors.fill: parent
+                            source: "clock.svg"
+                            smooth: true
+                            mipmap: true
+                            sourceSize.width: 13
+                            sourceSize.height: 13
+                            visible: false
+                            layer.enabled: true
+                        }
+
+                        ColorOverlay {
+                            anchors.fill: clockIcon
+                            source: clockIcon
+                            color: root.colClock
+                        }
+                    }
+
+                    Text {
+                        id: clock
+                        anchors.verticalCenter: parent.verticalCenter
+                        color: root.colClock
+                        font { family: root.fontFamily; pixelSize: root.fontSize - 2; bold: true }
+                        text: Qt.formatDateTime(new Date(), "HH:mm")
+                        Timer {
+                            interval: 1000
+                            running: true
+                            repeat: true
+                            onTriggered: clock.text = Qt.formatDateTime(new Date(), "HH:mm")
+                        }
                     }
                 }
             }
