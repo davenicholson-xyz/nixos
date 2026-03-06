@@ -1,0 +1,109 @@
+import Quickshell
+import Quickshell.Wayland
+import Quickshell.Io
+import Quickshell.Hyprland
+import QtQuick
+import QtQuick.Layouts
+import Qt5Compat.GraphicalEffects
+
+PanelWindow {
+    id: root
+
+    property color colBg: "#00000000"
+    property color colPill: "#99000000"
+    property color colWsActive: "#ffffff"
+    property color colWsOccupied: "#999999"
+    property color colWsEmpty: "#555555"
+    property color colClock: "#ffffff"
+    property string fontFamily: "JetBrainsMono Nerd Font"
+    property int fontSize: 13
+    property var wsIcons: ["terminal.svg", "browser.svg", "folder.svg"]
+
+    anchors.top: true
+    anchors.left: true
+    anchors.right: true
+    implicitHeight: 30
+    color: root.colBg
+
+    Item {
+        anchors.fill: parent
+        anchors.topMargin: 4
+        anchors.leftMargin: 8
+        anchors.rightMargin: 8
+
+        Rectangle {
+            anchors.centerIn: parent
+            color: root.colPill
+            radius: 12
+            width: workspaceRow.width + 16
+            height: workspaceRow.height + 8
+
+            Row {
+                id: workspaceRow
+                anchors.centerIn: parent
+                spacing: 8
+
+                Repeater {
+                    model: 3
+                    delegate: Item {
+                        property var ws: Hyprland.workspaces.values.find(w => w.id === index + 1)
+                        property bool isActive: Hyprland.focusedWorkspace?.id === (index + 1)
+                        property color wsColor: isActive ? root.colWsActive : (ws ? root.colWsOccupied : root.colWsEmpty)
+                        width: 16; height: 16
+
+                        Image {
+                            id: wsIcon
+                            anchors.fill: parent
+                            source: root.wsIcons[index]
+                            smooth: true
+                            mipmap: true
+                            sourceSize.width: 16
+                            sourceSize.height: 16
+                            visible: false
+                            layer.enabled: true
+                        }
+
+                        ColorOverlay {
+                            anchors.fill: wsIcon
+                            source: wsIcon
+                            color: parent.wsColor
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: Hyprland.dispatch("workspace " + (index + 1))
+                        }
+                    }
+                }
+            }
+        }
+
+        RowLayout {
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            spacing: 8
+
+
+            Rectangle {
+                color: root.colPill
+                radius: 12
+                width: clock.width + 16
+                height: clock.height + 8
+
+                Text {
+                    id: clock
+                    anchors.centerIn: parent
+                    color: root.colClock
+                    font { family: root.fontFamily; pixelSize: root.fontSize - 2; bold: true }
+                    text: Qt.formatDateTime(new Date(), "HH:mm")
+                    Timer {
+                        interval: 1000
+                        running: true
+                        repeat: true
+                        onTriggered: clock.text = Qt.formatDateTime(new Date(), "HH:mm")
+                    }
+                }
+            }
+        }
+    }
+}

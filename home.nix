@@ -7,8 +7,8 @@ in
 
   imports = [
     ./modules/nixvim.nix
-      ./modules/tmux.nix
-      ./modules/pychemy.nix
+    ./modules/tmux.nix
+    ./modules/pychemy.nix
   ];
 
   home.username = "dave";
@@ -18,6 +18,8 @@ in
 
   home.stateVersion = "25.11"; 
 
+  home.file.".config/quickshell".source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/nixos/config/quickshell";
+
   home.packages = with pkgs; [
     brave
       swww
@@ -26,8 +28,6 @@ in
       claude-code
       yazi
       hyprlauncher
-
-      quickshell
 
       ripgrep
       jq
@@ -44,8 +44,9 @@ in
 
     shellAliases = {
       ll = "ls -l";
+      lg = "lazygit";
       ehome = "nvim /home/dave/nixos/home.nix";
-      update = "cd /home/dave/nixos && nix flake update && sudo nixos-rebuild switch --impure --flake /home/dave/nixos#nixos";
+      update = "nix flake update --flake /home/dave/nixos && sudo nixos-rebuild switch --impure --flake /home/dave/nixos#nixos";
       rebuild = "sudo nixos-rebuild switch --impure --flake /home/dave/nixos#nixos";
     };
 

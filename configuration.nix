@@ -82,13 +82,21 @@
   nixpkgs.config.allowUnfree = true;
 
   environment.systemPackages = with pkgs; [
-    kitty
+      kitty
       neovim
       git
       tree
       xclip
       bat
+
+      quickshell
+      qt6.qt5compat
+
   ];
+
+  environment.sessionVariables = {
+    QML_IMPORT_PATH = "${pkgs.qt6.qt5compat}/lib/qt-6/qml";
+  };
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
