@@ -45,18 +45,20 @@ in
     shellAliases = {
       ll = "ls -l";
       ehome = "nvim /home/dave/nixos/home.nix";
-      update = "sudo nixos-rebuild switch --impure --flake /home/dave/nixos#nixos";
+      update = "cd /home/dave/nixos && nix flake update && sudo nixos-rebuild switch --impure --flake /home/dave/nixos#nixos";
+      rebuild = "sudo nixos-rebuild switch --impure --flake /home/dave/nixos#nixos";
     };
 
     history.size = 10000;
 
     initContent = ''
-      autoload -Uz vcs_info
-      precmd() { vcs_info }
+    autoload -Uz vcs_info
+    precmd() { vcs_info }
     zstyle ':vcs_info:git:*' formats ' (%b)'
-      setopt PROMPT_SUBST
-      PROMPT='%F{cyan}%~%f%F{yellow}''${vcs_info_msg_0_}%f %(?.%F{green}❯%f.%F{red}❯%f) '
-      '';
+    setopt PROMPT_SUBST
+    PROMPT='%F{cyan}%~%f%F{yellow}''${vcs_info_msg_0_}%f %(?.%F{green}❯%f.%F{red}❯%f) '
+  '';
+
   };
 
   programs.direnv = {
@@ -86,12 +88,15 @@ in
       script = "/home/dave/nixos/bin/setwallpaper";
       closeOnSelect = true;
       thumbSize = "sm";
+      minResolution = "1920x1080";
     };
   };
 
+ programs.lazygit = {
+  enable = true;
+  enableZshIntegration = true;
+ };
 
 programs.home-manager.enable = true;
-
-programs.waybar.enable = true;
 
 }

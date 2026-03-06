@@ -40,11 +40,9 @@
     systemd.setPath.enable = true;
   };
 
-  services.displayManager.sddm.settings = {
-    Autologin = {
-      Session = "hyprland";
-      User = "dave";
-    };
+  services.displayManager.autoLogin = {
+    enable = true;
+    user = "dave";
   };
 
   services.xserver.xkb = {
@@ -55,6 +53,10 @@
   console.keyMap = "uk";
 
   services.printing.enable = true;
+
+  hardware.bluetooth.enable = true;
+  hardware.bluetooth.powerOnBoot = true;
+  services.blueman.enable = true;  # optional but useful
 
   services.pulseaudio.enable = false;
   security.rtkit.enable = true;
