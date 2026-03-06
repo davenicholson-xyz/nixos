@@ -14,7 +14,7 @@
 
   networking.hostName = "nixos"; # Define your hostname.
 
-    networking.networkmanager.enable = true;
+  networking.networkmanager.enable = true;
 
   time.timeZone = "Europe/London";
 
@@ -39,8 +39,13 @@
     xwayland.enable = true;
     systemd.setPath.enable = true;
   };
-# services.displayManager.sddm.enable = true;
-# services.desktopManager.plasma6.enable = true;
+
+  services.displayManager.sddm.settings = {
+    Autologin = {
+      Session = "hyprland";
+      User = "dave";
+    };
+  };
 
   services.xserver.xkb = {
     layout = "gb";
@@ -79,7 +84,6 @@
       neovim
       git
       tree
-      ghostty
       xclip
       bat
   ];

@@ -1,9 +1,14 @@
-{ config, pkgs, pychemy, ... }: {
+{ config, pkgs, pychemy, nixvim, ... }: 
+
+let 
+  apiKey = builtins.readFile "/home/dave/.secrets/wallhaven-api-key";
+in 
+{
 
   imports = [
-    ./modules/neovim.nix
-    ./modules/tmux.nix
-    ./modules/pychemy.nix
+    ./modules/nixvim.nix
+      ./modules/tmux.nix
+      ./modules/pychemy.nix
   ];
 
   home.username = "dave";
@@ -15,11 +20,20 @@
 
   home.packages = with pkgs; [
     brave
-    swww
-    kitty
-    gh
-    claude-code
-    yazi
+      swww
+      kitty
+      gh
+      claude-code
+      yazi
+      hyprlauncher
+
+      quickshell
+
+      ripgrep
+      jq
+      fzf
+
+      nerd-fonts.jetbrains-mono
   ];
 
   programs.zsh = {
@@ -30,10 +44,19 @@
 
     shellAliases = {
       ll = "ls -l";
+      ehome = "nvim /home/dave/nixos/home.nix";
       update = "sudo nixos-rebuild switch --impure --flake /home/dave/nixos#nixos";
     };
 
     history.size = 10000;
+
+    initContent = ''
+      autoload -Uz vcs_info
+      precmd() { vcs_info }
+    zstyle ':vcs_info:git:*' formats ' (%b)'
+      setopt PROMPT_SUBST
+      PROMPT='%F{cyan}%~%f%F{yellow}''${vcs_info_msg_0_}%f %(?.%F{green}❯%f.%F{red}❯%f) '
+      '';
   };
 
   programs.direnv = {
@@ -41,7 +64,7 @@
     nix-direnv.enable = true;
   };
 
- programs.git = {
+  programs.git = {
     enable = true;
     settings = {
       user = {
@@ -52,16 +75,23 @@
     };
   }; 
 
+
   programs.pychemy = {
     enable = true;
     settings = {
-      username = "yourname";
-      apiKey = "your-api-key";
-      script = "/path/to/your/setwallpaper.sh";
-      thumbSize = "l";
+      username = "fatnic";
+      apiKey = apiKey;
+      categories = "101";
+      purity = "111";
+      script = "/home/dave/nixos/bin/setwallpaper";
       closeOnSelect = true;
+      thumbSize = "sm";
     };
   };
 
-  programs.home-manager.enable = true;
-                       }
+
+programs.home-manager.enable = true;
+
+programs.waybar.enable = true;
+
+}
