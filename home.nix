@@ -1,14 +1,14 @@
 { config, pkgs, pychemy, nixvim, ... }: 
 
 let 
-  apiKey = builtins.readFile "/home/dave/.secrets/wallhaven-api-key";
+apiKey = builtins.readFile "/home/dave/.secrets/wallhaven-api-key";
 in 
 {
 
   imports = [
     ./modules/nixvim.nix
-    ./modules/tmux.nix
-    ./modules/pychemy.nix
+      ./modules/tmux.nix
+      ./modules/pychemy.nix
   ];
 
   home.username = "dave";
@@ -22,7 +22,7 @@ in
   home.file.".config/quickshell".source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/nixos/config/quickshell";
 
   home.packages = with pkgs; [
-      brave
+    brave
       swww
       kitty
       gh
@@ -32,18 +32,29 @@ in
 
       ripgrep
       jq
-      fzf
       grim
       slurp
 
       nerd-fonts.jetbrains-mono
   ];
 
+  programs.fzf = {
+    enable = true;
+    enableZshIntegration = true;
+  };
+
   programs.zsh = {
     enable = true;
     enableCompletion = true;
     autosuggestion.enable = true;
     syntaxHighlighting.enable = true;
+
+    history = {
+      size = 10000;
+      save = 10000;
+      share = true;        # share history across sessions
+        ignoreDups = true;
+    };
 
     shellAliases = {
       ll = "ls -l";
@@ -53,27 +64,26 @@ in
       rebuild = "sudo nixos-rebuild switch --impure --flake /home/dave/nixos#nixos";
     };
 
-    history.size = 10000;
 
     initContent = ''
-  autoload -Uz vcs_info
-  precmd() { vcs_info }
-  zstyle ':vcs_info:git:*' formats ' (%b%u%c)'
-  zstyle ':vcs_info:git:*' actionformats ' (%b|%a%u%c)'
-  zstyle ':vcs_info:git:*' check-for-changes true
-  zstyle ':vcs_info:git:*' unstagedstr '!'
-  zstyle ':vcs_info:git:*' stagedstr '+'
-  setopt PROMPT_SUBST
-  PROMPT='%F{cyan}%~%f%F{yellow}''${vcs_info_msg_0_}%f %(?.%F{green}❯%f.%F{red}❯%f) '
-'';
+      autoload -Uz vcs_info
+      precmd() { vcs_info }
+    zstyle ':vcs_info:git:*' formats ' (%b%u%c)'
+      zstyle ':vcs_info:git:*' actionformats ' (%b|%a%u%c)'
+      zstyle ':vcs_info:git:*' check-for-changes true
+      zstyle ':vcs_info:git:*' unstagedstr '!'
+      zstyle ':vcs_info:git:*' stagedstr '+'
+      setopt PROMPT_SUBST
+      PROMPT='%F{cyan}%~%f%F{yellow}''${vcs_info_msg_0_}%f %(?.%F{green}❯%f.%F{red}❯%f) '
+      '';
 
-  #   initContent = ''
-  #   autoload -Uz vcs_info
-  #   precmd() { vcs_info }
-  #   zstyle ':vcs_info:git:*' formats ' (%b)'
-  #   setopt PROMPT_SUBST
-  #   PROMPT='%F{cyan}%~%f%F{yellow}''${vcs_info_msg_0_}%f %(?.%F{green}❯%f.%F{red}❯%f) '
-  # '';
+#   initContent = ''
+#   autoload -Uz vcs_info
+#   precmd() { vcs_info }
+#   zstyle ':vcs_info:git:*' formats ' (%b)'
+#   setopt PROMPT_SUBST
+#   PROMPT='%F{cyan}%~%f%F{yellow}''${vcs_info_msg_0_}%f %(?.%F{green}❯%f.%F{red}❯%f) '
+# '';
 
   };
 
@@ -108,11 +118,11 @@ in
     };
   };
 
- programs.lazygit = {
-  enable = true;
-  enableZshIntegration = true;
- };
+  programs.lazygit = {
+    enable = true;
+    enableZshIntegration = true;
+  };
 
-programs.home-manager.enable = true;
+  programs.home-manager.enable = true;
 
 }
