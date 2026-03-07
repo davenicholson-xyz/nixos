@@ -83,6 +83,77 @@ PanelWindow {
             anchors.verticalCenter: parent.verticalCenter
             spacing: 8
 
+            Rectangle {
+                id: drivePill
+                property int drivePct: 0
+                color: root.colPill
+                radius: 12
+                width: 76
+                height: driveColumn.height + 10
+
+                Row {
+                    id: driveColumn
+                    anchors.centerIn: parent
+                    spacing: 6
+
+                    Item {
+                        width: 13; height: 13
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        Image {
+                            id: driveIcon
+                            anchors.fill: parent
+                            source: "drive.svg"
+                            smooth: true
+                            mipmap: true
+                            sourceSize.width: 13
+                            sourceSize.height: 13
+                            visible: false
+                            layer.enabled: true
+                        }
+
+                        ColorOverlay {
+                            anchors.fill: driveIcon
+                            source: driveIcon
+                            color: root.colClock
+                        }
+                    }
+
+                    Rectangle {
+                        width: 44
+                        height: 3
+                        radius: 2
+                        anchors.verticalCenter: parent.verticalCenter
+                        color: "#0d1b4a"
+
+                        Process {
+                            id: driveProc
+                            command: ["sh", "-c", "df --output=pcent / | tail -1 | tr -d ' '"]
+                            running: true
+                            stdout: SplitParser {
+                                onRead: data => {
+                                    var num = parseInt(data.trim())
+                                    if (!isNaN(num)) drivePill.drivePct = num
+                                }
+                            }
+                        }
+
+                        Timer {
+                            interval: 30000
+                            running: true
+                            repeat: true
+                            onTriggered: driveProc.running = true
+                        }
+
+                        Rectangle {
+                            width: parent.width * (drivePill.drivePct / 100)
+                            height: parent.height
+                            radius: 2
+                            color: drivePill.drivePct >= 95 ? "#e05252" : drivePill.drivePct >= 90 ? "#e0c94a" : "#3b6fd4"
+                        }
+                    }
+                }
+            }
 
             Rectangle {
                 color: root.colPill
