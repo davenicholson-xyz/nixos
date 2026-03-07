@@ -22,7 +22,7 @@ in
   home.file.".config/quickshell".source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/nixos/config/quickshell";
 
   home.packages = with pkgs; [
-    brave
+      brave
       swww
       kitty
       gh
@@ -33,6 +33,8 @@ in
       ripgrep
       jq
       fzf
+      grim
+      slurp
 
       nerd-fonts.jetbrains-mono
   ];
@@ -54,12 +56,24 @@ in
     history.size = 10000;
 
     initContent = ''
-    autoload -Uz vcs_info
-    precmd() { vcs_info }
-    zstyle ':vcs_info:git:*' formats ' (%b)'
-    setopt PROMPT_SUBST
-    PROMPT='%F{cyan}%~%f%F{yellow}''${vcs_info_msg_0_}%f %(?.%F{green}❯%f.%F{red}❯%f) '
-  '';
+  autoload -Uz vcs_info
+  precmd() { vcs_info }
+  zstyle ':vcs_info:git:*' formats ' (%b%u%c)'
+  zstyle ':vcs_info:git:*' actionformats ' (%b|%a%u%c)'
+  zstyle ':vcs_info:git:*' check-for-changes true
+  zstyle ':vcs_info:git:*' unstagedstr '!'
+  zstyle ':vcs_info:git:*' stagedstr '+'
+  setopt PROMPT_SUBST
+  PROMPT='%F{cyan}%~%f%F{yellow}''${vcs_info_msg_0_}%f %(?.%F{green}❯%f.%F{red}❯%f) '
+'';
+
+  #   initContent = ''
+  #   autoload -Uz vcs_info
+  #   precmd() { vcs_info }
+  #   zstyle ':vcs_info:git:*' formats ' (%b)'
+  #   setopt PROMPT_SUBST
+  #   PROMPT='%F{cyan}%~%f%F{yellow}''${vcs_info_msg_0_}%f %(?.%F{green}❯%f.%F{red}❯%f) '
+  # '';
 
   };
 

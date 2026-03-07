@@ -34,6 +34,8 @@
       which-key.enable = true;
       web-devicons.enable = true;
       bufferline.enable = true;
+      vim-surround.enable = true;
+      neotree.enable = true;
     };
 
   keymaps = [
@@ -59,16 +61,6 @@
       action = "<cmd>Telescope oldfiles<CR>";
       key = "<leader>fh";
     }
-    {
-      action = "<cmd>Telescope colorscheme<CR>";
-      key = "<leader>ch";
-    }
-
-    {
-      action = "<cmd>Telescope man_pages<CR>";
-      key = "<leader>fm";
-    }
-
 
     {
       mode = "n";

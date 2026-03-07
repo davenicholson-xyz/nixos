@@ -56,7 +56,7 @@
 
   hardware.bluetooth.enable = true;
   hardware.bluetooth.powerOnBoot = true;
-  services.blueman.enable = true;  # optional but useful
+  services.blueman.enable = true;  
 
   services.pulseaudio.enable = false;
   security.rtkit.enable = true;
@@ -88,6 +88,7 @@
       tree
       xclip
       bat
+      wlogout
 
       quickshell
       qt6.qt5compat
