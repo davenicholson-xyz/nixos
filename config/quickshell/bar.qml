@@ -15,6 +15,7 @@ PanelWindow {
     property color colWsOccupied: "#999999"
     property color colWsEmpty: "#555555"
     property color colClock: "#ffffff"
+    property color colBarTrack: root.colWsEmpty
     property string fontFamily: "JetBrainsMono Nerd Font"
     property int fontSize: 13
     property var wsIcons: ["terminal.svg", "browser.svg", "folder.svg", "music.svg"]
@@ -126,7 +127,7 @@ PanelWindow {
                         height: 3
                         radius: 2
                         anchors.verticalCenter: parent.verticalCenter
-                        color: "#0d1b4a"
+                        color: root.colBarTrack
 
                         Process {
                             id: cpuProc
@@ -159,7 +160,7 @@ PanelWindow {
                             width: parent.width * (cpuPill.cpuPct / 100)
                             height: parent.height
                             radius: 2
-                            color: cpuPill.cpuPct >= 95 ? "#e05252" : cpuPill.cpuPct >= 90 ? "#e0c94a" : "#3b6fd4"
+                            color: cpuPill.cpuPct >= 95 ? "#e05252" : cpuPill.cpuPct >= 80 ? "#e0c94a" : root.colWsActive
                         }
                     }
                 }
@@ -206,7 +207,7 @@ PanelWindow {
                         height: 3
                         radius: 2
                         anchors.verticalCenter: parent.verticalCenter
-                        color: "#0d1b4a"
+                        color: root.colBarTrack
 
                         Process {
                             id: ramProc
@@ -231,7 +232,7 @@ PanelWindow {
                             width: parent.width * (ramPill.ramPct / 100)
                             height: parent.height
                             radius: 2
-                            color: ramPill.ramPct >= 95 ? "#e05252" : ramPill.ramPct >= 90 ? "#e0c94a" : "#3b6fd4"
+                            color: ramPill.ramPct >= 95 ? "#e05252" : ramPill.ramPct >= 80 ? "#e0c94a" : root.colWsActive
                         }
                     }
                 }
@@ -278,7 +279,7 @@ PanelWindow {
                         height: 3
                         radius: 2
                         anchors.verticalCenter: parent.verticalCenter
-                        color: "#0d1b4a"
+                        color: root.colBarTrack
 
                         Process {
                             id: driveProc
@@ -303,7 +304,7 @@ PanelWindow {
                             width: parent.width * (drivePill.drivePct / 100)
                             height: parent.height
                             radius: 2
-                            color: drivePill.drivePct >= 95 ? "#e05252" : drivePill.drivePct >= 90 ? "#e0c94a" : "#3b6fd4"
+                            color: drivePill.drivePct >= 95 ? "#e05252" : drivePill.drivePct >= 80 ? "#e0c94a" : root.colWsActive
                         }
                     }
                 }
