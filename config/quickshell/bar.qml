@@ -17,7 +17,7 @@ PanelWindow {
     property color colClock: "#ffffff"
     property string fontFamily: "JetBrainsMono Nerd Font"
     property int fontSize: 13
-    property var wsIcons: ["terminal.svg", "browser.svg", "folder.svg"]
+    property var wsIcons: ["terminal.svg", "browser.svg", "folder.svg", "music.svg"]
 
     anchors.top: true
     anchors.left: true
@@ -44,7 +44,7 @@ PanelWindow {
                 spacing: 8
 
                 Repeater {
-                    model: 3
+                    model: 4
                     delegate: Item {
                         property var ws: Hyprland.workspaces.values.find(w => w.id === index + 1)
                         property bool isActive: Hyprland.focusedWorkspace?.id === (index + 1)

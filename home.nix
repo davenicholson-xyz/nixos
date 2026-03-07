@@ -1,7 +1,7 @@
-{ config, pkgs, pychemy, nixvim, ... }: 
+{ config, pkgs, lib, pychemy, nixvim, ... }: 
 
 let 
-apiKey = builtins.readFile "/home/dave/.secrets/wallhaven-api-key";
+apiKey = lib.strings.trim(builtins.readFile "/home/dave/.secrets/wallhaven-api-key");
 in 
 {
 
@@ -30,6 +30,7 @@ in
       claude-code
       yazi
       hyprlauncher
+      spotify
 
       ripgrep
       jq
