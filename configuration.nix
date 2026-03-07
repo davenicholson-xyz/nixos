@@ -14,7 +14,7 @@
 
   networking.hostName = "nixos"; # Define your hostname.
 
-  networking.networkmanager.enable = true;
+    networking.networkmanager.enable = true;
 
   time.timeZone = "Europe/London";
 
@@ -30,6 +30,20 @@
     LC_PAPER = "en_GB.UTF-8";
     LC_TELEPHONE = "en_GB.UTF-8";
     LC_TIME = "en_GB.UTF-8";
+  };
+
+  environment.sessionVariables = {
+    LIBVA_DRIVER_NAME = "iHD";
+  };
+
+  hardware.graphics = {
+    enable = true;
+    extraPackages = with pkgs; [
+      intel-media-driver  # iHD, for 8th gen+
+        intel-vaapi-driver
+        libva-vdpau-driver
+        libvdpau-va-gl
+    ];
   };
 
   services.xserver.enable = true;
@@ -82,7 +96,7 @@
   nixpkgs.config.allowUnfree = true;
 
   environment.systemPackages = with pkgs; [
-      kitty
+    kitty
       neovim
       git
       tree

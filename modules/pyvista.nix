@@ -1,7 +1,7 @@
-{ config, lib, pkgs, pychemy, ... }:
+{ config, lib, pkgs, pyvista, ... }:
 
 let
-  cfg = config.programs.pychemy;
+  cfg = config.programs.pyvista;
 
   tomlFormat = pkgs.formats.toml {};
 
@@ -20,8 +20,8 @@ let
   );
 
 in {
-  options.programs.pychemy = {
-    enable = lib.mkEnableOption "pychemy wallhaven gallery browser";
+  options.programs.pyvista = {
+    enable = lib.mkEnableOption "pyvista wallhaven gallery browser";
 
     settings = {
       apiKey = lib.mkOption {
@@ -73,8 +73,8 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
-    home.packages = [ pychemy.packages.${pkgs.system}.default ];
+    home.packages = [ pyvista.packages.${pkgs.system}.default ];
 
-    xdg.configFile."pychemy/config.toml".source = configFile;
+    xdg.configFile."pyvista/config.toml".source = configFile;
   };
 }

@@ -11,11 +11,11 @@
 
     };
 
-    pychemy.url = "github:davenicholson-xyz/pychemy";
+    pyvista.url = "github:davenicholson-xyz/pyvista";
     nixvim.url = "github:nix-community/nixvim";
   };
 
-  outputs = { self, nixpkgs, home-manager, pychemy, nixvim, ... }:
+  outputs = { self, nixpkgs, home-manager, pyvista, nixvim, ... }:
   {
     nixosConfigurations = {
       nixos = nixpkgs.lib.nixosSystem {
@@ -26,7 +26,7 @@
           {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
-            home-manager.extraSpecialArgs = { inherit pychemy; inherit nixvim; };
+            home-manager.extraSpecialArgs = { inherit pyvista; inherit nixvim; };
             home-manager.users.dave = import ./home.nix;
             home-manager.backupFileExtension = "bak";
           }

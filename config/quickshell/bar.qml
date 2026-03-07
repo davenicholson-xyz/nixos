@@ -84,6 +84,160 @@ PanelWindow {
             spacing: 8
 
             Rectangle {
+                id: cpuPill
+                property int prevTotal: 0
+                property int prevIdle: 0
+                property int cpuPct: 0
+                color: root.colPill
+                radius: 12
+                width: 76
+                height: cpuRow.height + 10
+
+                Row {
+                    id: cpuRow
+                    anchors.centerIn: parent
+                    spacing: 6
+
+                    Item {
+                        width: 13; height: 13
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        Image {
+                            id: cpuIcon
+                            anchors.fill: parent
+                            source: "cpu.svg"
+                            smooth: true
+                            mipmap: true
+                            sourceSize.width: 13
+                            sourceSize.height: 13
+                            visible: false
+                            layer.enabled: true
+                        }
+
+                        ColorOverlay {
+                            anchors.fill: cpuIcon
+                            source: cpuIcon
+                            color: root.colClock
+                        }
+                    }
+
+                    Rectangle {
+                        width: 44
+                        height: 3
+                        radius: 2
+                        anchors.verticalCenter: parent.verticalCenter
+                        color: "#0d1b4a"
+
+                        Process {
+                            id: cpuProc
+                            command: ["sh", "-c", "awk '/^cpu /{print $2+$3+$4+$5+$6+$7+$8, $5}' /proc/stat"]
+                            running: true
+                            stdout: SplitParser {
+                                onRead: data => {
+                                    var parts = data.trim().split(" ")
+                                    var total = parseInt(parts[0])
+                                    var idle = parseInt(parts[1])
+                                    if (cpuPill.prevTotal !== 0) {
+                                        var dt = total - cpuPill.prevTotal
+                                        var di = idle - cpuPill.prevIdle
+                                        if (dt > 0) cpuPill.cpuPct = Math.round((1 - di / dt) * 100)
+                                    }
+                                    cpuPill.prevTotal = total
+                                    cpuPill.prevIdle = idle
+                                }
+                            }
+                        }
+
+                        Timer {
+                            interval: 2000
+                            running: true
+                            repeat: true
+                            onTriggered: cpuProc.running = true
+                        }
+
+                        Rectangle {
+                            width: parent.width * (cpuPill.cpuPct / 100)
+                            height: parent.height
+                            radius: 2
+                            color: cpuPill.cpuPct >= 95 ? "#e05252" : cpuPill.cpuPct >= 90 ? "#e0c94a" : "#3b6fd4"
+                        }
+                    }
+                }
+            }
+
+            Rectangle {
+                id: ramPill
+                property int ramPct: 0
+                color: root.colPill
+                radius: 12
+                width: 76
+                height: ramRow.height + 10
+
+                Row {
+                    id: ramRow
+                    anchors.centerIn: parent
+                    spacing: 6
+
+                    Item {
+                        width: 13; height: 13
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        Image {
+                            id: ramIcon
+                            anchors.fill: parent
+                            source: "ram.svg"
+                            smooth: true
+                            mipmap: true
+                            sourceSize.width: 13
+                            sourceSize.height: 13
+                            visible: false
+                            layer.enabled: true
+                        }
+
+                        ColorOverlay {
+                            anchors.fill: ramIcon
+                            source: ramIcon
+                            color: root.colClock
+                        }
+                    }
+
+                    Rectangle {
+                        width: 44
+                        height: 3
+                        radius: 2
+                        anchors.verticalCenter: parent.verticalCenter
+                        color: "#0d1b4a"
+
+                        Process {
+                            id: ramProc
+                            command: ["sh", "-c", "awk '/MemTotal/{t=$2} /MemAvailable/{a=$2} END{printf \"%.0f\", (t-a)/t*100}' /proc/meminfo"]
+                            running: true
+                            stdout: SplitParser {
+                                onRead: data => {
+                                    var num = parseInt(data.trim())
+                                    if (!isNaN(num)) ramPill.ramPct = num
+                                }
+                            }
+                        }
+
+                        Timer {
+                            interval: 3000
+                            running: true
+                            repeat: true
+                            onTriggered: ramProc.running = true
+                        }
+
+                        Rectangle {
+                            width: parent.width * (ramPill.ramPct / 100)
+                            height: parent.height
+                            radius: 2
+                            color: ramPill.ramPct >= 95 ? "#e05252" : ramPill.ramPct >= 90 ? "#e0c94a" : "#3b6fd4"
+                        }
+                    }
+                }
+            }
+
+            Rectangle {
                 id: drivePill
                 property int drivePct: 0
                 color: root.colPill

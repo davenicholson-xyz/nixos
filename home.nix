@@ -1,4 +1,4 @@
-{ config, pkgs, lib, pychemy, nixvim, ... }: 
+{ config, pkgs, lib, pyvista, nixvim, ... }: 
 
 let 
 apiKey = lib.strings.trim(builtins.readFile "/home/dave/.secrets/wallhaven-api-key");
@@ -8,7 +8,7 @@ in
   imports = [
     ./modules/nixvim.nix
       ./modules/tmux.nix
-      ./modules/pychemy.nix
+      ./modules/pyvista.nix
   ];
 
   home.username = "dave";
@@ -36,6 +36,8 @@ in
       jq
       grim
       slurp
+      fastfetch
+      trash-cli
 
       nerd-fonts.jetbrains-mono
   ];
@@ -106,7 +108,7 @@ in
   }; 
 
 
-  programs.pychemy = {
+  programs.pyvista = {
     enable = true;
     settings = {
       username = "fatnic";
