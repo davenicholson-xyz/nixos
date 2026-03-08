@@ -19,6 +19,7 @@ PanelWindow {
     property string fontFamily: "JetBrainsMono Nerd Font"
     property int fontSize: 13
     property var wsIcons: ["terminal.svg", "browser.svg", "folder.svg", "music.svg"]
+    property bool pillsVisible: false
 
     anchors.top: true
     anchors.left: true
@@ -86,6 +87,7 @@ PanelWindow {
 
             Rectangle {
                 id: cpuPill
+                visible: root.pillsVisible
                 property int prevTotal: 0
                 property int prevIdle: 0
                 property int cpuPct: 0
@@ -168,6 +170,7 @@ PanelWindow {
 
             Rectangle {
                 id: ramPill
+                visible: root.pillsVisible
                 property int ramPct: 0
                 color: root.colPill
                 radius: 12
@@ -240,6 +243,7 @@ PanelWindow {
 
             Rectangle {
                 id: drivePill
+                visible: root.pillsVisible
                 property int drivePct: 0
                 color: root.colPill
                 radius: 12
@@ -311,6 +315,18 @@ PanelWindow {
             }
 
             Rectangle {
+                width: 8; height: 8
+                radius: 4
+                Layout.alignment: Qt.AlignVCenter
+                color: root.pillsVisible ? root.colPill : root.colWsEmpty
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: root.pillsVisible = !root.pillsVisible
+                }
+            }
+
+            Rectangle {
                 color: root.colPill
                 radius: 12
                 width: clockRow.width + 16
@@ -357,6 +373,7 @@ PanelWindow {
                             onTriggered: clock.text = Qt.formatDateTime(new Date(), "HH:mm")
                         }
                     }
+
                 }
             }
         }
