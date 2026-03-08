@@ -45,11 +45,6 @@ PanelWindow {
         }
         PauseAnimation { duration: 40 }
         ParallelAnimation {
-            NumberAnimation { target: tempPill; property: "xOff"; to: 0; duration: 220; easing.type: Easing.OutCubic }
-            NumberAnimation { target: tempPill; property: "opacity"; to: 1; duration: 180; easing.type: Easing.OutCubic }
-        }
-        PauseAnimation { duration: 40 }
-        ParallelAnimation {
             NumberAnimation { target: cpuPill; property: "xOff"; to: 0; duration: 220; easing.type: Easing.OutCubic }
             NumberAnimation { target: cpuPill; property: "opacity"; to: 1; duration: 180; easing.type: Easing.OutCubic }
         }
@@ -60,11 +55,6 @@ PanelWindow {
         ParallelAnimation {
             NumberAnimation { target: cpuPill; property: "xOff"; to: 24; duration: 160; easing.type: Easing.InCubic }
             NumberAnimation { target: cpuPill; property: "opacity"; to: 0; duration: 120; easing.type: Easing.InCubic }
-        }
-        PauseAnimation { duration: 30 }
-        ParallelAnimation {
-            NumberAnimation { target: tempPill; property: "xOff"; to: 24; duration: 160; easing.type: Easing.InCubic }
-            NumberAnimation { target: tempPill; property: "opacity"; to: 0; duration: 120; easing.type: Easing.InCubic }
         }
         PauseAnimation { duration: 30 }
         ParallelAnimation {
@@ -83,6 +73,102 @@ PanelWindow {
     anchors.right: true
     implicitHeight: 30
     color: root.colBg
+
+    PopupWindow {
+        visible: typeof cpuHover !== "undefined" && cpuHover.containsMouse
+        width: 120
+        height: 52
+        color: "transparent"
+        anchor.window: root
+        anchor.item: cpuPill
+        anchor.edges: Edges.Bottom
+        anchor.gravity: Edges.Bottom
+        anchor.margins.top: 4
+
+        Rectangle {
+            anchors.fill: parent
+            color: root.colPill
+            radius: 10
+            Column {
+                anchors.centerIn: parent
+                spacing: 4
+                Text {
+                    text: "CPU   " + cpuPill.cpuPct + "%"
+                    color: root.colWsActive
+                    font { family: root.fontFamily; pixelSize: root.fontSize - 2 }
+                }
+                Text {
+                    text: "Temp  " + cpuPill.tempC + "°C"
+                    color: cpuPill.tempC >= 90 ? "#e05252" : cpuPill.tempC >= 75 ? "#e0c94a" : root.colWsActive
+                    font { family: root.fontFamily; pixelSize: root.fontSize - 2 }
+                }
+            }
+        }
+    }
+
+    PopupWindow {
+        visible: typeof ramHover !== "undefined" && ramHover.containsMouse
+        width: 140
+        height: 52
+        color: "transparent"
+        anchor.window: root
+        anchor.item: ramPill
+        anchor.edges: Edges.Bottom
+        anchor.gravity: Edges.Bottom
+        anchor.margins.top: 4
+
+        Rectangle {
+            anchors.fill: parent
+            color: root.colPill
+            radius: 10
+            Column {
+                anchors.centerIn: parent
+                spacing: 4
+                Text {
+                    text: "RAM   " + ramPill.ramPct + "%"
+                    color: root.colWsActive
+                    font { family: root.fontFamily; pixelSize: root.fontSize - 2 }
+                }
+                Text {
+                    text: ramPill.ramInfo
+                    color: root.colWsOccupied
+                    font { family: root.fontFamily; pixelSize: root.fontSize - 2 }
+                }
+            }
+        }
+    }
+
+    PopupWindow {
+        visible: typeof driveHover !== "undefined" && driveHover.containsMouse
+        width: 160
+        height: 52
+        color: "transparent"
+        anchor.window: root
+        anchor.item: drivePill
+        anchor.edges: Edges.Bottom
+        anchor.gravity: Edges.Bottom
+        anchor.margins.top: 4
+
+        Rectangle {
+            anchors.fill: parent
+            color: root.colPill
+            radius: 10
+            Column {
+                anchors.centerIn: parent
+                spacing: 4
+                Text {
+                    text: "Disk  " + drivePill.drivePct + "%"
+                    color: root.colWsActive
+                    font { family: root.fontFamily; pixelSize: root.fontSize - 2 }
+                }
+                Text {
+                    text: drivePill.driveInfo
+                    color: root.colWsOccupied
+                    font { family: root.fontFamily; pixelSize: root.fontSize - 2 }
+                }
+            }
+        }
+    }
 
     Item {
         anchors.fill: parent
@@ -151,6 +237,7 @@ PanelWindow {
                 property int prevTotal: 0
                 property int prevIdle: 0
                 property int cpuPct: 0
+                property int tempC: 0
                 opacity: 0
                 transform: Translate { x: cpuPill.xOff }
                 color: root.colPill
@@ -228,77 +315,27 @@ PanelWindow {
                         }
                     }
                 }
-            }
 
-            Rectangle {
-                id: tempPill
-                property real xOff: 24
-                property int tempC: 0
-                opacity: 0
-                transform: Translate { x: tempPill.xOff }
-                color: root.colPill
-                radius: 12
-                width: 62
-                height: tempRow.height + 10
-
-                Row {
-                    id: tempRow
-                    anchors.centerIn: parent
-                    spacing: 6
-
-                    Item {
-                        width: 13; height: 13
-                        anchors.verticalCenter: parent.verticalCenter
-
-                        Image {
-                            id: tempIcon
-                            anchors.fill: parent
-                            source: "temp.svg"
-                            smooth: true; mipmap: true
-                            sourceSize.width: 13; sourceSize.height: 13
-                            visible: false
-                            layer.enabled: true
-                        }
-
-                        ColorOverlay {
-                            anchors.fill: tempIcon
-                            source: tempIcon
-                            color: root.colClock
-                        }
-                    }
-
-                    Text {
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: tempPill.tempC + "°"
-                        color: tempPill.tempC >= 90 ? "#e05252" : tempPill.tempC >= 75 ? "#e0c94a" : root.colWsActive
-                        font { family: root.fontFamily; pixelSize: root.fontSize - 4; bold: true }
-
-                        Process {
-                            id: tempProc
-                            command: ["sh", "-c", "cat /sys/class/thermal/thermal_zone1/temp"]
-                            running: true
-                            stdout: SplitParser {
-                                onRead: data => {
-                                    var num = parseInt(data.trim())
-                                    if (!isNaN(num)) tempPill.tempC = Math.round(num / 1000)
-                                }
-                            }
-                        }
-
-                        Timer {
-                            interval: 3000
-                            running: true
-                            repeat: true
-                            onTriggered: tempProc.running = true
+                Process {
+                    id: tempProc
+                    command: ["sh", "-c", "cat /sys/class/thermal/thermal_zone1/temp"]
+                    running: true
+                    stdout: SplitParser {
+                        onRead: data => {
+                            var num = parseInt(data.trim())
+                            if (!isNaN(num)) cpuPill.tempC = Math.round(num / 1000)
                         }
                     }
                 }
+                Timer { interval: 3000; running: true; repeat: true; onTriggered: tempProc.running = true }
+                MouseArea { id: cpuHover; anchors.fill: parent; hoverEnabled: true }
             }
 
             Rectangle {
                 id: ramPill
                 property real xOff: 24
                 property int ramPct: 0
+                property string ramInfo: ""
                 opacity: 0
                 transform: Translate { x: ramPill.xOff }
                 color: root.colPill
@@ -368,12 +405,22 @@ PanelWindow {
                         }
                     }
                 }
+
+                Process {
+                    id: ramInfoProc
+                    command: ["sh", "-c", "free -h | awk '/^Mem:/{print $3\" / \"$2}'"]
+                    running: true
+                    stdout: SplitParser { onRead: data => ramPill.ramInfo = data.trim() }
+                }
+                Timer { interval: 3000; running: true; repeat: true; onTriggered: ramInfoProc.running = true }
+                MouseArea { id: ramHover; anchors.fill: parent; hoverEnabled: true }
             }
 
             Rectangle {
                 id: drivePill
                 property real xOff: 24
                 property int drivePct: 0
+                property string driveInfo: ""
                 opacity: 0
                 transform: Translate { x: drivePill.xOff }
                 color: root.colPill
@@ -443,6 +490,15 @@ PanelWindow {
                         }
                     }
                 }
+
+                Process {
+                    id: driveInfoProc
+                    command: ["sh", "-c", "df -h / | awk 'NR==2{print $3\" / \"$2}'"]
+                    running: true
+                    stdout: SplitParser { onRead: data => drivePill.driveInfo = data.trim() }
+                }
+                Timer { interval: 30000; running: true; repeat: true; onTriggered: driveInfoProc.running = true }
+                MouseArea { id: driveHover; anchors.fill: parent; hoverEnabled: true }
             }
             } // Row
 
