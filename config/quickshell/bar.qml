@@ -21,6 +21,17 @@ PanelWindow {
     property var wsIcons: ["terminal.svg", "browser.svg", "folder.svg", "music.svg"]
     property bool pillsVisible: false
 
+    GlobalShortcut {
+        appid: "quickshell"
+        name: "togglePills"
+        description: "Toggle info pills"
+        onPressed: {
+            root.pillsVisible = !root.pillsVisible
+            if (root.pillsVisible) { hideAnim.stop(); showAnim.start() }
+            else { showAnim.stop(); hideAnim.start() }
+        }
+    }
+
     SequentialAnimation {
         id: showAnim
         ParallelAnimation {
@@ -34,6 +45,11 @@ PanelWindow {
         }
         PauseAnimation { duration: 40 }
         ParallelAnimation {
+            NumberAnimation { target: tempPill; property: "xOff"; to: 0; duration: 220; easing.type: Easing.OutCubic }
+            NumberAnimation { target: tempPill; property: "opacity"; to: 1; duration: 180; easing.type: Easing.OutCubic }
+        }
+        PauseAnimation { duration: 40 }
+        ParallelAnimation {
             NumberAnimation { target: cpuPill; property: "xOff"; to: 0; duration: 220; easing.type: Easing.OutCubic }
             NumberAnimation { target: cpuPill; property: "opacity"; to: 1; duration: 180; easing.type: Easing.OutCubic }
         }
@@ -44,6 +60,11 @@ PanelWindow {
         ParallelAnimation {
             NumberAnimation { target: cpuPill; property: "xOff"; to: 24; duration: 160; easing.type: Easing.InCubic }
             NumberAnimation { target: cpuPill; property: "opacity"; to: 0; duration: 120; easing.type: Easing.InCubic }
+        }
+        PauseAnimation { duration: 30 }
+        ParallelAnimation {
+            NumberAnimation { target: tempPill; property: "xOff"; to: 24; duration: 160; easing.type: Easing.InCubic }
+            NumberAnimation { target: tempPill; property: "opacity"; to: 0; duration: 120; easing.type: Easing.InCubic }
         }
         PauseAnimation { duration: 30 }
         ParallelAnimation {
@@ -204,6 +225,71 @@ PanelWindow {
                             height: parent.height
                             radius: 2
                             color: cpuPill.cpuPct >= 95 ? "#e05252" : cpuPill.cpuPct >= 80 ? "#e0c94a" : root.colWsActive
+                        }
+                    }
+                }
+            }
+
+            Rectangle {
+                id: tempPill
+                property real xOff: 24
+                property int tempC: 0
+                opacity: 0
+                transform: Translate { x: tempPill.xOff }
+                color: root.colPill
+                radius: 12
+                width: 62
+                height: tempRow.height + 10
+
+                Row {
+                    id: tempRow
+                    anchors.centerIn: parent
+                    spacing: 6
+
+                    Item {
+                        width: 13; height: 13
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        Image {
+                            id: tempIcon
+                            anchors.fill: parent
+                            source: "temp.svg"
+                            smooth: true; mipmap: true
+                            sourceSize.width: 13; sourceSize.height: 13
+                            visible: false
+                            layer.enabled: true
+                        }
+
+                        ColorOverlay {
+                            anchors.fill: tempIcon
+                            source: tempIcon
+                            color: root.colClock
+                        }
+                    }
+
+                    Text {
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: tempPill.tempC + "°"
+                        color: tempPill.tempC >= 90 ? "#e05252" : tempPill.tempC >= 75 ? "#e0c94a" : root.colWsActive
+                        font { family: root.fontFamily; pixelSize: root.fontSize - 4; bold: true }
+
+                        Process {
+                            id: tempProc
+                            command: ["sh", "-c", "cat /sys/class/thermal/thermal_zone1/temp"]
+                            running: true
+                            stdout: SplitParser {
+                                onRead: data => {
+                                    var num = parseInt(data.trim())
+                                    if (!isNaN(num)) tempPill.tempC = Math.round(num / 1000)
+                                }
+                            }
+                        }
+
+                        Timer {
+                            interval: 3000
+                            running: true
+                            repeat: true
+                            onTriggered: tempProc.running = true
                         }
                     }
                 }
