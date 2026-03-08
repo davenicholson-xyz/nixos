@@ -28,17 +28,41 @@
     plugins = {
       lualine.enable = true;
       telescope.enable = true;
-      treesitter.enable = true;
       oil.enable = true;      
       gitsigns.enable = true;
       which-key.enable = true;
       web-devicons.enable = true;
       bufferline.enable = true;
       vim-surround.enable = true;
-      neotree.enable = true;
+      neo-tree = {
+        enable = true;
+        settingss = {
+          close_if_last_window = true;
+          filesystem = {
+            follow_current_file = {
+              enabled = true;
+              leave_dirs_open = true;
+            };
+          };
+        };
+      };
+      treesitter = {
+        treesitter.enable = true;
+        grammarPackages = with pkgs.vimPlugins.nvim-treesitter.builtGrammars; [
+          bash
+            json
+            lua
+            nix
+            regex
+            toml
+            vim
+            xml
+            yaml
+        ];
+      };
     };
 
-  keymaps = [
+    keymaps = [
 
     {
       action = "<cmd>Neotree toggle<CR>";
@@ -88,6 +112,6 @@
         desc = "Delete buffer";
       };
     }
-  ];
-};
+    ];
+  };
 }
