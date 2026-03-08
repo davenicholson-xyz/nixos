@@ -21,6 +21,42 @@ PanelWindow {
     property var wsIcons: ["terminal.svg", "browser.svg", "folder.svg", "music.svg"]
     property bool pillsVisible: false
 
+    SequentialAnimation {
+        id: showAnim
+        ParallelAnimation {
+            NumberAnimation { target: drivePill; property: "xOff"; to: 0; duration: 220; easing.type: Easing.OutCubic }
+            NumberAnimation { target: drivePill; property: "opacity"; to: 1; duration: 180; easing.type: Easing.OutCubic }
+        }
+        PauseAnimation { duration: 40 }
+        ParallelAnimation {
+            NumberAnimation { target: ramPill; property: "xOff"; to: 0; duration: 220; easing.type: Easing.OutCubic }
+            NumberAnimation { target: ramPill; property: "opacity"; to: 1; duration: 180; easing.type: Easing.OutCubic }
+        }
+        PauseAnimation { duration: 40 }
+        ParallelAnimation {
+            NumberAnimation { target: cpuPill; property: "xOff"; to: 0; duration: 220; easing.type: Easing.OutCubic }
+            NumberAnimation { target: cpuPill; property: "opacity"; to: 1; duration: 180; easing.type: Easing.OutCubic }
+        }
+    }
+
+    SequentialAnimation {
+        id: hideAnim
+        ParallelAnimation {
+            NumberAnimation { target: cpuPill; property: "xOff"; to: 24; duration: 160; easing.type: Easing.InCubic }
+            NumberAnimation { target: cpuPill; property: "opacity"; to: 0; duration: 120; easing.type: Easing.InCubic }
+        }
+        PauseAnimation { duration: 30 }
+        ParallelAnimation {
+            NumberAnimation { target: ramPill; property: "xOff"; to: 24; duration: 160; easing.type: Easing.InCubic }
+            NumberAnimation { target: ramPill; property: "opacity"; to: 0; duration: 120; easing.type: Easing.InCubic }
+        }
+        PauseAnimation { duration: 30 }
+        ParallelAnimation {
+            NumberAnimation { target: drivePill; property: "xOff"; to: 24; duration: 160; easing.type: Easing.InCubic }
+            NumberAnimation { target: drivePill; property: "opacity"; to: 0; duration: 120; easing.type: Easing.InCubic }
+        }
+    }
+
     anchors.top: true
     anchors.left: true
     anchors.right: true
@@ -85,12 +121,17 @@ PanelWindow {
             anchors.verticalCenter: parent.verticalCenter
             spacing: 8
 
+            Row {
+                spacing: 8
+
             Rectangle {
                 id: cpuPill
-                visible: root.pillsVisible
+                property real xOff: 24
                 property int prevTotal: 0
                 property int prevIdle: 0
                 property int cpuPct: 0
+                opacity: 0
+                transform: Translate { x: cpuPill.xOff }
                 color: root.colPill
                 radius: 12
                 width: 76
@@ -170,8 +211,10 @@ PanelWindow {
 
             Rectangle {
                 id: ramPill
-                visible: root.pillsVisible
+                property real xOff: 24
                 property int ramPct: 0
+                opacity: 0
+                transform: Translate { x: ramPill.xOff }
                 color: root.colPill
                 radius: 12
                 width: 76
@@ -243,8 +286,10 @@ PanelWindow {
 
             Rectangle {
                 id: drivePill
-                visible: root.pillsVisible
+                property real xOff: 24
                 property int drivePct: 0
+                opacity: 0
+                transform: Translate { x: drivePill.xOff }
                 color: root.colPill
                 radius: 12
                 width: 76
@@ -313,6 +358,7 @@ PanelWindow {
                     }
                 }
             }
+            } // Row
 
             Rectangle {
                 width: 8; height: 8
@@ -322,7 +368,11 @@ PanelWindow {
                 MouseArea {
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
-                    onClicked: root.pillsVisible = !root.pillsVisible
+                    onClicked: {
+                        root.pillsVisible = !root.pillsVisible
+                        if (root.pillsVisible) { hideAnim.stop(); showAnim.start() }
+                        else { showAnim.stop(); hideAnim.start() }
+                    }
                 }
             }
 
