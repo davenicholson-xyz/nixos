@@ -1,0 +1,141 @@
+#!/usr/bin/env bash
+
+# toggler.sh - Toggle comment blocks marked with @@toggler
+# Usage: toggler.sh <file>
+
+set -euo pipefail
+
+if [[ $# -ne 1 ]]; then
+    echo "Usage: $(basename "$0") <file>" >&2
+    exit 1
+fi
+
+FILE="$1"
+
+if [[ ! -f "$FILE" ]]; then
+    echo "Error: File '$FILE' not found." >&2
+    exit 1
+fi
+
+TMPFILE=$(mktemp)
+trap 'rm -f "$TMPFILE"' EXIT
+
+awk '
+function is_toggler(line) {
+    return line ~ /^[[:space:]]*#[[:space:]]*@@toggler[[:space:]]*$/
+}
+
+function is_comment(line) {
+    return line ~ /^[[:space:]]*#/
+}
+
+function is_blank(line) {
+    return line ~ /^[[:space:]]*$/
+}
+
+function add_comment(line,    i) {
+    i = 1
+    while (i <= length(line) && (substr(line, i, 1) == " " || substr(line, i, 1) == "\t")) {
+        i++
+    }
+    return substr(line, 1, i-1) "#" substr(line, i)
+}
+
+function remove_comment(line,    i, j) {
+    i = 1
+    while (i <= length(line) && (substr(line, i, 1) == " " || substr(line, i, 1) == "\t")) {
+        i++
+    }
+    j = i + 1
+    if (j <= length(line) && substr(line, j, 1) == " ") {
+        j++
+    }
+    return substr(line, 1, i-1) substr(line, j)
+}
+
+function flush_block(    i, active, next_comment) {
+    if (block_count == 0) return
+
+    active = -1
+    for (i = 0; i < block_count; i++) {
+        if (!block_is_comment[i]) {
+            active = i
+            break
+        }
+    }
+
+    if (active == -1) {
+        for (i = 0; i < block_count; i++) {
+            if (i == 0) {
+                print remove_comment(block_lines[i])
+            } else {
+                print block_lines[i]
+            }
+        }
+        return
+    }
+
+    next_comment = -1
+    for (i = active + 1; i < block_count; i++) {
+        if (block_is_comment[i]) {
+            next_comment = i
+            break
+        }
+    }
+
+    if (next_comment == -1) {
+        for (i = 0; i < active; i++) {
+            if (block_is_comment[i]) {
+                next_comment = i
+                break
+            }
+        }
+    }
+
+    for (i = 0; i < block_count; i++) {
+        if (i == active) {
+            print add_comment(block_lines[i])
+        } else if (i == next_comment) {
+            print remove_comment(block_lines[i])
+        } else {
+            print block_lines[i]
+        }
+    }
+}
+
+{
+    if (in_block) {
+        if (is_blank($0)) {
+            flush_block()
+            block_count = 0
+            in_block = 0
+            print $0
+        } else if (is_toggler($0)) {
+            flush_block()
+            block_count = 0
+            print $0
+        } else {
+            block_lines[block_count] = $0
+            block_is_comment[block_count] = is_comment($0)
+            block_count++
+        }
+    } else {
+        if (is_toggler($0)) {
+            print $0
+            in_block = 1
+            block_count = 0
+        } else {
+            print $0
+        }
+    }
+}
+
+END {
+    if (in_block && block_count > 0) {
+        flush_block()
+    }
+}
+' in_block=0 block_count=0 "$FILE" > "$TMPFILE"
+
+cp "$TMPFILE" "$FILE"
+echo "Toggled: $FILE"
