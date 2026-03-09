@@ -81,14 +81,6 @@ in
       PROMPT='%F{cyan}%~%f%F{yellow}''${vcs_info_msg_0_}%f %(?.%F{green}❯%f.%F{red}❯%f) '
       '';
 
-#   initContent = ''
-#   autoload -Uz vcs_info
-#   precmd() { vcs_info }
-#   zstyle ':vcs_info:git:*' formats ' (%b)'
-#   setopt PROMPT_SUBST
-#   PROMPT='%F{cyan}%~%f%F{yellow}''${vcs_info_msg_0_}%f %(?.%F{green}❯%f.%F{red}❯%f) '
-# '';
-
   };
 
   programs.direnv = {
@@ -114,7 +106,7 @@ in
       username = "fatnic";
       apiKey = apiKey;
       categories = "101";
-      purity = "111";
+      purity = "110";
       script = "/home/dave/nixos/bin/setwallpaper";
       closeOnSelect = true;
       thumbSize = "sm";
