@@ -15,6 +15,10 @@ Rectangle {
     property int tempC: 0
     property var topProcs: []
     property var _procBuf: []
+    property var corePcts: []
+    property var _corePrevTotals: []
+    property var _corePrevIdles: []
+    property var _coreBuf: []
 
     opacity: 0
     transform: Translate { x: pill.xOff }
@@ -116,11 +120,41 @@ Rectangle {
     }
     Timer { interval: 2000; running: true; repeat: true; onTriggered: topProcsProc.running = true }
 
+    Process {
+        id: coreProc
+        command: ["sh", "-c", "awk '/^cpu[0-9]/{print $1, $2+$3+$4+$5+$6+$7+$8, $5}' /proc/stat"]
+        running: true
+        onRunningChanged: if (running) pill._coreBuf = []
+        stdout: SplitParser {
+            onRead: data => {
+                var parts = data.trim().split(" ")
+                var coreIdx = parseInt(parts[0].substring(3))
+                var total = parseInt(parts[1])
+                var idle = parseInt(parts[2])
+                var prevTotal = pill._corePrevTotals[coreIdx] || 0
+                var prevIdle = pill._corePrevIdles[coreIdx] || 0
+                var pct = 0
+                if (prevTotal !== 0) {
+                    var dt = total - prevTotal
+                    var di = idle - prevIdle
+                    if (dt > 0) pct = Math.round((1 - di / dt) * 100)
+                }
+                pill._corePrevTotals[coreIdx] = total
+                pill._corePrevIdles[coreIdx] = idle
+                var buf = pill._coreBuf.slice()
+                buf[coreIdx] = pct
+                pill._coreBuf = buf
+            }
+        }
+        onExited: pill.corePcts = pill._coreBuf.slice()
+    }
+    Timer { interval: 2000; running: true; repeat: true; onTriggered: coreProc.running = true }
+
     MouseArea { id: cpuHover; anchors.fill: parent; hoverEnabled: true }
 
     PopupWindow {
         visible: panelRoot.pillsVisible && cpuHover.containsMouse
-        implicitWidth: 190
+        implicitWidth: 200
         implicitHeight: cpuPopupRect.height + 8
         color: "transparent"
         anchor.window: panelRoot
@@ -149,6 +183,45 @@ Rectangle {
                     text: "Temp  " + pill.tempC + "°C"
                     color: pill.tempC >= 90 ? "#e05252" : pill.tempC >= 75 ? "#e0c94a" : panelRoot.colWsActive
                     font { family: panelRoot.fontFamily; pixelSize: panelRoot.fontSize - 2 }
+                }
+                Rectangle {
+                    width: cpuPopupCol.width
+                    height: 1
+                    color: panelRoot.colBarTrack
+                    visible: pill.corePcts.length > 0
+                }
+                Repeater {
+                    model: pill.corePcts
+                    delegate: Row {
+                        width: cpuPopupCol.width
+                        spacing: 4
+                        Text {
+                            text: "C" + index
+                            color: panelRoot.colWsOccupied
+                            font { family: panelRoot.fontFamily; pixelSize: panelRoot.fontSize - 3 }
+                            width: 18
+                        }
+                        Rectangle {
+                            width: cpuPopupCol.width - 18 - 36 - 8
+                            height: 3
+                            radius: 2
+                            anchors.verticalCenter: parent.verticalCenter
+                            color: panelRoot.colBarTrack
+                            Rectangle {
+                                width: parent.width * (modelData / 100)
+                                height: parent.height
+                                radius: 2
+                                color: modelData >= 95 ? "#e05252" : modelData >= 80 ? "#e0c94a" : panelRoot.colWsActive
+                            }
+                        }
+                        Text {
+                            text: modelData + "%"
+                            color: panelRoot.colWsOccupied
+                            font { family: panelRoot.fontFamily; pixelSize: panelRoot.fontSize - 3 }
+                            width: 36
+                            horizontalAlignment: Text.AlignRight
+                        }
+                    }
                 }
                 Rectangle {
                     width: cpuPopupCol.width
