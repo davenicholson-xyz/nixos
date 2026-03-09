@@ -10,15 +10,15 @@ PanelWindow {
     id: root
 
     property color colBg: "#00000000"
-    property color colPill: "#99000000"
+    property color colPill: "#cc000000"
     property color colWsActive: "#ffffff"
     property color colWsOccupied: "#999999"
     property color colWsEmpty: "#555555"
     property color colClock: "#ffffff"
     property color colBarTrack: root.colWsEmpty
-    property string fontFamily: "JetBrainsMono Nerd Font"
+    property string fontFamily: "SauceCodePro Nerd Font"
     property int fontSize: 13
-    property var wsIcons: ["terminal.svg", "browser.svg", "folder.svg", "music.svg"]
+    property var wsIcons: ["icons/terminal.svg", "icons/browser.svg", "icons/folder.svg", "icons/music.svg"]
     property bool pillsVisible: false
 
     GlobalShortcut {
@@ -199,6 +199,86 @@ PanelWindow {
         }
     }
 
+    PopupWindow {
+        visible: typeof spotifyHover !== "undefined" && spotifyHover.containsMouse && spotifyPill.spotifyRunning
+        implicitWidth: 230
+        implicitHeight: spotifyPopupRect.height + 8
+        color: "transparent"
+        anchor.window: root
+        anchor.item: spotifyPill
+        anchor.edges: Edges.Bottom
+        anchor.gravity: Edges.Bottom
+
+        Rectangle {
+            id: spotifyPopupRect
+            anchors { left: parent.left; right: parent.right; top: parent.top; topMargin: 8 }
+            height: spotifyPopupRow.implicitHeight + 20
+            color: root.colPill
+            radius: 10
+
+            Row {
+                id: spotifyPopupRow
+                anchors { left: parent.left; right: parent.right; top: parent.top; margins: 10 }
+                spacing: 10
+
+                Item {
+                    width: 56; height: 56
+                    anchors.verticalCenter: parent.verticalCenter
+
+                    Image {
+                        id: popupArtImg
+                        anchors.fill: parent
+                        source: spotifyPill.artUrl
+                        fillMode: Image.PreserveAspectCrop
+                        smooth: true
+                        mipmap: true
+                        visible: false
+                        layer.enabled: true
+                    }
+                    Rectangle {
+                        id: popupArtMask
+                        anchors.fill: parent
+                        radius: 6
+                        visible: false
+                        layer.enabled: true
+                    }
+                    OpacityMask {
+                        anchors.fill: parent
+                        source: popupArtImg
+                        maskSource: popupArtMask
+                    }
+                }
+
+                Column {
+                    id: spotifyPopupCol
+                    spacing: 4
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: parent.width - 56 - parent.spacing
+
+                    Text {
+                        text: spotifyPill.trackName
+                        color: root.colWsActive
+                        font { family: root.fontFamily; pixelSize: root.fontSize - 2 }
+                        elide: Text.ElideRight
+                        width: parent.width
+                    }
+                    Text {
+                        text: spotifyPill.artistName
+                        color: root.colWsOccupied
+                        font { family: root.fontFamily; pixelSize: root.fontSize - 2 }
+                        elide: Text.ElideRight
+                        width: parent.width
+                    }
+                    Text {
+                        text: spotifyPill.posStr + " / " + spotifyPill.durStr
+                        color: root.colWsEmpty
+                        font { family: root.fontFamily; pixelSize: root.fontSize - 2 }
+                    }
+                }
+            }
+        }
+    }
+
     Item {
         anchors.fill: parent
         anchors.topMargin: 4
@@ -252,6 +332,139 @@ PanelWindow {
             }
         }
 
+        Rectangle {
+            id: spotifyPill
+            property bool spotifyRunning: false
+            property string spotifyStatus: ""
+            property string artUrl: ""
+            property real trackProgress: 0
+            property string trackName: ""
+            property string artistName: ""
+            property string posStr: "0:00"
+            property string durStr: "0:00"
+            property real _durSecs: 0
+
+            anchors.left: parent.left
+            anchors.verticalCenter: parent.verticalCenter
+
+            color: root.colPill
+            radius: 12
+            width: 110
+            height: spotifyRow.height + 10
+
+            opacity: spotifyRunning ? 1 : 0
+            visible: opacity > 0
+            Behavior on opacity {
+                NumberAnimation { duration: 200; easing.type: Easing.OutCubic }
+            }
+
+            Row {
+                id: spotifyRow
+                anchors.centerIn: parent
+                spacing: 6
+
+                Item {
+                    width: 13; height: 13
+                    anchors.verticalCenter: parent.verticalCenter
+
+                    Image {
+                        id: artImg
+                        anchors.fill: parent
+                        source: spotifyPill.artUrl
+                        fillMode: Image.PreserveAspectCrop
+                        smooth: true
+                        mipmap: true
+                        visible: false
+                        layer.enabled: true
+                    }
+                    Rectangle {
+                        id: artMask
+                        anchors.fill: parent
+                        radius: 3
+                        visible: false
+                        layer.enabled: true
+                    }
+                    OpacityMask {
+                        anchors.fill: parent
+                        source: artImg
+                        maskSource: artMask
+                    }
+                }
+
+                Rectangle {
+                    width: 71; height: 3
+                    radius: 2
+                    anchors.verticalCenter: parent.verticalCenter
+                    color: root.colBarTrack
+
+                    Rectangle {
+                        width: parent.width * spotifyPill.trackProgress
+                        height: parent.height
+                        radius: 2
+                        color: root.colWsActive
+                        opacity: spotifyPill.spotifyStatus === "Paused" ? 0.4 : 1
+                        Behavior on opacity { NumberAnimation { duration: 200 } }
+                    }
+                }
+            }
+
+            MouseArea { id: spotifyHover; anchors.fill: parent; hoverEnabled: true }
+
+            Process {
+                id: spotifyProc
+                command: ["sh", "-c",
+                    "S=$(playerctl -p spotify status 2>/dev/null) || { echo 'status:Stopped'; exit 0; }; " +
+                    "echo \"status:$S\"; " +
+                    "playerctl -p spotify metadata --format $'art:{{mpris:artUrl}}\\ntitle:{{xesam:title}}\\nartist:{{xesam:artist}}\\nlength:{{mpris:length}}' 2>/dev/null; " +
+                    "playerctl -p spotify position 2>/dev/null | awk '{print \"pos:\" $1}'"
+                ]
+                running: true
+                stdout: SplitParser {
+                    onRead: data => {
+                        var line = data.trim()
+                        if (line.startsWith("status:")) {
+                            var s = line.slice(7)
+                            spotifyPill.spotifyStatus = s
+                            spotifyPill.spotifyRunning = (s === "Playing" || s === "Paused")
+                        } else if (line.startsWith("art:")) {
+                            var url = line.slice(4)
+                            if (url !== spotifyPill.artUrl) spotifyPill.artUrl = url
+                        } else if (line.startsWith("title:")) {
+                            spotifyPill.trackName = line.slice(6)
+                        } else if (line.startsWith("artist:")) {
+                            spotifyPill.artistName = line.slice(7)
+                        } else if (line.startsWith("length:")) {
+                            spotifyPill._durSecs = parseInt(line.slice(7)) / 1000000
+                        } else if (line.startsWith("pos:")) {
+                            var pos = parseFloat(line.slice(4))
+                            var dur = spotifyPill._durSecs
+                            spotifyPill.trackProgress = dur > 0 ? Math.min(pos / dur, 1) : 0
+                            var fmt = function(s) {
+                                var m = Math.floor(s / 60)
+                                var sec = Math.floor(s % 60)
+                                return m + ":" + (sec < 10 ? "0" : "") + sec
+                            }
+                            spotifyPill.posStr = fmt(pos)
+                            spotifyPill.durStr = fmt(dur)
+                        }
+                    }
+                }
+                onExited: {
+                    if (!spotifyPill.spotifyRunning) {
+                        spotifyPill.trackProgress = 0
+                        spotifyPill.artUrl = ""
+                    }
+                }
+            }
+
+            Timer {
+                interval: 2000
+                running: true
+                repeat: true
+                onTriggered: spotifyProc.running = true
+            }
+        }
+
         RowLayout {
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
@@ -288,7 +501,7 @@ PanelWindow {
                         Image {
                             id: cpuIcon
                             anchors.fill: parent
-                            source: "cpu.svg"
+                            source: "icons/cpu.svg"
                             smooth: true
                             mipmap: true
                             sourceSize.width: 13
@@ -402,7 +615,7 @@ PanelWindow {
                         Image {
                             id: ramIcon
                             anchors.fill: parent
-                            source: "ram.svg"
+                            source: "icons/ram.svg"
                             smooth: true
                             mipmap: true
                             sourceSize.width: 13
@@ -487,7 +700,7 @@ PanelWindow {
                         Image {
                             id: driveIcon
                             anchors.fill: parent
-                            source: "drive.svg"
+                            source: "icons/drive.svg"
                             smooth: true
                             mipmap: true
                             sourceSize.width: 13
@@ -583,7 +796,7 @@ PanelWindow {
                         Image {
                             id: clockIcon
                             anchors.fill: parent
-                            source: "clock.svg"
+                            source: "icons/clock.svg"
                             smooth: true
                             mipmap: true
                             sourceSize.width: 13

@@ -40,6 +40,7 @@ in
       trash-cli
 
       nerd-fonts.jetbrains-mono
+      nerd-fonts.sauce-code-pro
   ];
 
   programs.fzf = {

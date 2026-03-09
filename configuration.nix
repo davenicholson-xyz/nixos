@@ -103,6 +103,7 @@
       xclip
       bat
       wlogout
+      playerctl
 
       quickshell
       qt6.qt5compat
