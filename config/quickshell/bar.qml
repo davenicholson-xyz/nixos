@@ -75,23 +75,27 @@ PanelWindow {
     color: root.colBg
 
     PopupWindow {
-        visible: typeof cpuHover !== "undefined" && cpuHover.containsMouse
-        width: 120
-        height: 52
+        visible: root.pillsVisible && typeof cpuHover !== "undefined" && cpuHover.containsMouse
+        implicitWidth: 190
+        implicitHeight: cpuPopupRect.height + 8
         color: "transparent"
         anchor.window: root
         anchor.item: cpuPill
         anchor.edges: Edges.Bottom
         anchor.gravity: Edges.Bottom
-        anchor.margins.top: 4
 
         Rectangle {
-            anchors.fill: parent
+            id: cpuPopupRect
+            anchors { left: parent.left; right: parent.right; top: parent.top; topMargin: 8 }
+            height: cpuPopupCol.implicitHeight + 20
             color: root.colPill
             radius: 10
+
             Column {
-                anchors.centerIn: parent
+                id: cpuPopupCol
+                anchors { left: parent.left; right: parent.right; top: parent.top; margins: 10 }
                 spacing: 4
+
                 Text {
                     text: "CPU   " + cpuPill.cpuPct + "%"
                     color: root.colWsActive
@@ -102,23 +106,49 @@ PanelWindow {
                     color: cpuPill.tempC >= 90 ? "#e05252" : cpuPill.tempC >= 75 ? "#e0c94a" : root.colWsActive
                     font { family: root.fontFamily; pixelSize: root.fontSize - 2 }
                 }
+                Rectangle {
+                    width: cpuPopupCol.width
+                    height: 1
+                    color: root.colBarTrack
+                    visible: cpuPill.topProcs.length > 0
+                }
+                Repeater {
+                    model: cpuPill.topProcs
+                    delegate: Row {
+                        width: cpuPopupCol.width
+                        Text {
+                            text: modelData.name
+                            color: root.colWsOccupied
+                            font { family: root.fontFamily; pixelSize: root.fontSize - 2 }
+                            width: parent.width - 44
+                            elide: Text.ElideRight
+                        }
+                        Text {
+                            text: modelData.pct
+                            color: root.colWsOccupied
+                            font { family: root.fontFamily; pixelSize: root.fontSize - 2 }
+                            width: 44
+                            horizontalAlignment: Text.AlignRight
+                        }
+                    }
+                }
             }
         }
     }
 
     PopupWindow {
-        visible: typeof ramHover !== "undefined" && ramHover.containsMouse
-        width: 140
-        height: 52
+        visible: root.pillsVisible && typeof ramHover !== "undefined" && ramHover.containsMouse
+        implicitWidth: 140
+        implicitHeight: 60
         color: "transparent"
         anchor.window: root
         anchor.item: ramPill
         anchor.edges: Edges.Bottom
         anchor.gravity: Edges.Bottom
-        anchor.margins.top: 4
 
         Rectangle {
             anchors.fill: parent
+            anchors.topMargin: 8
             color: root.colPill
             radius: 10
             Column {
@@ -139,18 +169,17 @@ PanelWindow {
     }
 
     PopupWindow {
-        visible: typeof driveHover !== "undefined" && driveHover.containsMouse
-        width: 160
-        height: 52
+        visible: root.pillsVisible && typeof driveHover !== "undefined" && driveHover.containsMouse
+        implicitWidth: 160
+        implicitHeight: 60
         color: "transparent"
         anchor.window: root
         anchor.item: drivePill
         anchor.edges: Edges.Bottom
         anchor.gravity: Edges.Bottom
-        anchor.margins.top: 4
-
         Rectangle {
             anchors.fill: parent
+            anchors.topMargin: 8
             color: root.colPill
             radius: 10
             Column {
@@ -238,6 +267,8 @@ PanelWindow {
                 property int prevIdle: 0
                 property int cpuPct: 0
                 property int tempC: 0
+                property var topProcs: []
+                property var _procBuf: []
                 opacity: 0
                 transform: Translate { x: cpuPill.xOff }
                 color: root.colPill
@@ -328,6 +359,22 @@ PanelWindow {
                     }
                 }
                 Timer { interval: 3000; running: true; repeat: true; onTriggered: tempProc.running = true }
+
+                Process {
+                    id: topProcsProc
+                    command: ["sh", "-c", "ps -eo comm,%cpu --sort=-%cpu | awk 'NR>1 && $2+0>0 {c++; printf \"%s\\t%s\\n\", $1, $2; if(c>=10) exit}'"]
+                    running: true
+                    onRunningChanged: if (running) cpuPill._procBuf = []
+                    stdout: SplitParser {
+                        onRead: data => {
+                            var p = data.trim().split("\t")
+                            if (p.length >= 2) cpuPill._procBuf.push({name: p[0], pct: p[1] + "%"})
+                        }
+                    }
+                    onExited: cpuPill.topProcs = cpuPill._procBuf.slice()
+                }
+                Timer { interval: 2000; running: true; repeat: true; onTriggered: topProcsProc.running = true }
+
                 MouseArea { id: cpuHover; anchors.fill: parent; hoverEnabled: true }
             }
 
