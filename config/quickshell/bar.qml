@@ -146,11 +146,26 @@ PanelWindow {
                 DrivePill { id: drivePill; panelRoot: root }
             }
 
-            Rectangle {
-                width: 8; height: 8
-                radius: 4
+            Item {
+                width: 14; height: 14
                 Layout.alignment: Qt.AlignVCenter
-                color: root.pillsVisible ? root.colPill : root.colWsEmpty
+
+                Image {
+                    id: toggleArrow
+                    anchors.fill: parent
+                    source: root.pillsVisible ? "icons/right-arrow.svg" : "icons/left-arrow.svg"
+                    smooth: true
+                    mipmap: true
+                    sourceSize.width: 14
+                    sourceSize.height: 14
+                    visible: false
+                    layer.enabled: true
+                }
+                ColorOverlay {
+                    anchors.fill: toggleArrow
+                    source: toggleArrow
+                    color: root.colPill
+                }
                 MouseArea {
                     anchors.fill: parent
                     cursorShape: Qt.PointingHandCursor
