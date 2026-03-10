@@ -31,6 +31,13 @@ PanelWindow {
         }
     }
 
+    GlobalShortcut {
+        appid: "quickshell"
+        name: "toggleLauncher"
+        description: "Toggle launcher pill"
+        onPressed: launcherPill.toggle()
+    }
+
     SequentialAnimation {
         id: showAnim
         ParallelAnimation {
@@ -82,6 +89,7 @@ PanelWindow {
     anchors.right: true
     implicitHeight: 30
     color: root.colBg
+    WlrLayershell.keyboardFocus: launcherPill.launcherOpen ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
     Item {
         anchors.fill: parent
