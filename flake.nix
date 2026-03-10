@@ -19,9 +19,9 @@
   {
     nixosConfigurations = {
       nixos = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        modules = [ 
-          ./configuration.nix 
+        modules = [
+          { nixpkgs.hostPlatform.system = "x86_64-linux"; }
+          ./configuration.nix
           home-manager.nixosModules.home-manager
           {
             home-manager.useGlobalPkgs = true;
