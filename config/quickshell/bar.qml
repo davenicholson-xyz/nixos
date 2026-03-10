@@ -136,11 +136,22 @@ PanelWindow {
             }
         }
 
-        SpotifyPill {
-            id: spotifyPill
-            panelRoot: root
+        Row {
             anchors.left: parent.left
             anchors.verticalCenter: parent.verticalCenter
+            spacing: 8
+
+            LauncherPill {
+                id: launcherPill
+                panelRoot: root
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            SpotifyPill {
+                id: spotifyPill
+                panelRoot: root
+                anchors.verticalCenter: parent.verticalCenter
+            }
         }
 
         RowLayout {
