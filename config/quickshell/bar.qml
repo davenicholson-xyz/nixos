@@ -149,14 +149,14 @@ PanelWindow {
             anchors.verticalCenter: parent.verticalCenter
             spacing: 8
 
-            LauncherPill {
-                id: launcherPill
+            SpotifyPill {
+                id: spotifyPill
                 panelRoot: root
                 anchors.verticalCenter: parent.verticalCenter
             }
 
-            SpotifyPill {
-                id: spotifyPill
+            LauncherPill {
+                id: launcherPill
                 panelRoot: root
                 anchors.verticalCenter: parent.verticalCenter
             }
