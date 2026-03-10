@@ -26,7 +26,7 @@ Rectangle {
     transform: Translate { x: pill.xOff }
     color: panelRoot.colPill
     radius: 12
-    width: 94
+    width: 80
     height: 23
 
     function formatSpeed(bps) {
