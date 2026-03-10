@@ -118,7 +118,7 @@ in
       script = "/home/dave/nixos/bin/setwallpaper";
       closeOnSelect = true;
       thumbSize = "sm";
-      minResolution = "1920x1080";
+      minResolution = "2560x1440";
     };
   };
 
