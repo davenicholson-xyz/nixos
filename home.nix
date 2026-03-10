@@ -72,6 +72,7 @@ in
       ehome = "nvim /home/dave/nixos/home.nix";
       rebuild = "nh os switch --impure";
       update = "nh os switch --impure -u";
+      cleanup = "nh clean all --keep 3";
       # update = "nix flake update --flake /home/dave/nixos && sudo nixos-rebuild switch --impure --flake /home/dave/nixos#nixos";
       # rebuild = "sudo nixos-rebuild switch --impure --flake /home/dave/nixos#nixos";
     };
