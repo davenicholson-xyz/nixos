@@ -16,6 +16,10 @@ in
 
   home.sessionPath = [ "$HOME/nixos/bin" ];
 
+  home.sessionVariables = {
+    NH_FLAKE = "/home/dave/nixos";
+  };
+
   home.stateVersion = "25.11"; 
 
   home.file.".config/hypr".source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/nixos/config/hypr";
@@ -38,6 +42,7 @@ in
       slurp
       fastfetch
       trash-cli
+      nh
 
       nerd-fonts.jetbrains-mono
       nerd-fonts.sauce-code-pro
@@ -65,8 +70,10 @@ in
       ll = "ls -l";
       lg = "lazygit";
       ehome = "nvim /home/dave/nixos/home.nix";
-      update = "nix flake update --flake /home/dave/nixos && sudo nixos-rebuild switch --impure --flake /home/dave/nixos#nixos";
-      rebuild = "sudo nixos-rebuild switch --impure --flake /home/dave/nixos#nixos";
+      rebuild = "nh os switch --flake";
+      update = "nh os switch --flake -u";
+      # update = "nix flake update --flake /home/dave/nixos && sudo nixos-rebuild switch --impure --flake /home/dave/nixos#nixos";
+      # rebuild = "sudo nixos-rebuild switch --impure --flake /home/dave/nixos#nixos";
     };
 
 
