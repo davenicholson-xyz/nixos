@@ -70,8 +70,8 @@ in
       ll = "ls -l";
       lg = "lazygit";
       ehome = "nvim /home/dave/nixos/home.nix";
-      rebuild = "nh os switch --flake";
-      update = "nh os switch --flake -u";
+      rebuild = "nh os switch --impure";
+      update = "nh os switch --impure -u";
       # update = "nix flake update --flake /home/dave/nixos && sudo nixos-rebuild switch --impure --flake /home/dave/nixos#nixos";
       # rebuild = "sudo nixos-rebuild switch --impure --flake /home/dave/nixos#nixos";
     };
