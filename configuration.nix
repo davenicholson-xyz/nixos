@@ -11,6 +11,12 @@
   boot.loader.systemd-boot.configurationLimit = 10;
 
   boot.kernelPackages = pkgs.linuxPackages_latest;
+  boot.kernelParams = [ "usbcore.autosuspend=-1" ];
+
+services.upower.enable = false; # if you don't need it
+# or more targeted:
+powerManagement.enable = false;
+
 
   networking.hostName = "nixos"; # Define your hostname.
 
