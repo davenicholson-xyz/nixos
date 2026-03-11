@@ -12,6 +12,7 @@ let
       query             = cfg.settings.query;
       categories        = cfg.settings.categories;
       purity            = cfg.settings.purity;
+      "thumb-size"      = cfg.settings.thumbSize;
       "min-resolution"  = cfg.settings.minResolution;
       script            = cfg.settings.script;
       output            = if cfg.settings.output then true else null;
@@ -53,6 +54,11 @@ in {
         type = lib.types.str;
         default = "";
         description = "Minimum resolution e.g. 1920x1080";
+      };
+      thumbSize = lib.mkOption {
+        type = lib.types.int;
+        default = 200;
+        description = "Thumbnail width in the grid";
       };
       script = lib.mkOption {
         type = lib.types.str;

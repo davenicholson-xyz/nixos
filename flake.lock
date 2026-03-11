@@ -45,11 +45,11 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1773246449,
-        "narHash": "sha256-MfJx45WaO1ysaujaglob2p8imznM2I3Lt2I9LINZTV4=",
+        "lastModified": 1773247336,
+        "narHash": "sha256-6wIN87MRQu1UoFrruFgJZ9gs7uxf2LTV/tSu9WpJU4w=",
         "owner": "davenicholson-xyz",
         "repo": "govista",
-        "rev": "3c779b850354b42fe0c180ab3a54aea37b2ab081",
+        "rev": "917df75e2514ca6f7a39632c0ce2ea33678d5100",
         "type": "github"
       },
       "original": {
