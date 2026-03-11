@@ -23,7 +23,7 @@
     },
     "flake-utils": {
       "inputs": {
-        "systems": "systems_2"
+        "systems": "systems"
       },
       "locked": {
         "lastModified": 1731533236,
@@ -39,6 +39,25 @@
         "type": "github"
       }
     },
+    "govista": {
+      "inputs": {
+        "flake-utils": "flake-utils",
+        "nixpkgs": "nixpkgs"
+      },
+      "locked": {
+        "lastModified": 1773245162,
+        "narHash": "sha256-tHd+rXEoAtAHUFqzO/FCRo1EA0Fptg8o1xigBw5+17I=",
+        "owner": "davenicholson-xyz",
+        "repo": "govista",
+        "rev": "3a9aa9cf03da1f823967be63f24227166541c150",
+        "type": "github"
+      },
+      "original": {
+        "owner": "davenicholson-xyz",
+        "repo": "govista",
+        "type": "github"
+      }
+    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -46,11 +65,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1773093840,
-        "narHash": "sha256-u/96NoAyN8BSRuM3ZimGf7vyYgXa3pLx4MYWjokuoH4=",
+        "lastModified": 1773179137,
+        "narHash": "sha256-EdW2bwzlfme0vbMOcStnNmKlOAA05Bp6su2O8VLGT0k=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "bb014746edb2a98d975abde4dd40fa240de4cf86",
+        "rev": "3f98e2bbc661ec0aaf558d8a283d6955f05f1d09",
         "type": "github"
       },
       "original": {
@@ -69,12 +88,28 @@
         "type": "github"
       },
       "original": {
+        "owner": "NixOS",
+        "ref": "nixos-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs_2": {
+      "locked": {
+        "lastModified": 1772963539,
+        "narHash": "sha256-9jVDGZnvCckTGdYT53d/EfznygLskyLQXYwJLKMPsZs=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "9dcb002ca1690658be4a04645215baea8b95f31d",
+        "type": "github"
+      },
+      "original": {
         "id": "nixpkgs",
         "ref": "nixos-unstable",
         "type": "indirect"
       }
     },
-    "nixpkgs_2": {
+    "nixpkgs_3": {
       "locked": {
         "lastModified": 1770380644,
         "narHash": "sha256-P7dWMHRUWG5m4G+06jDyThXO7kwSk46C1kgjEWcybkE=",
@@ -90,27 +125,11 @@
         "type": "github"
       }
     },
-    "nixpkgs_3": {
-      "locked": {
-        "lastModified": 1772542754,
-        "narHash": "sha256-WGV2hy+VIeQsYXpsLjdr4GvHv5eECMISX1zKLTedhdg=",
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "8c809a146a140c5c8806f13399592dbcb1bb5dc4",
-        "type": "github"
-      },
-      "original": {
-        "owner": "NixOS",
-        "ref": "nixos-unstable",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
     "nixvim": {
       "inputs": {
         "flake-parts": "flake-parts",
-        "nixpkgs": "nixpkgs_2",
-        "systems": "systems"
+        "nixpkgs": "nixpkgs_3",
+        "systems": "systems_2"
       },
       "locked": {
         "lastModified": 1772402258,
@@ -126,31 +145,12 @@
         "type": "github"
       }
     },
-    "pyvista": {
-      "inputs": {
-        "flake-utils": "flake-utils",
-        "nixpkgs": "nixpkgs_3"
-      },
-      "locked": {
-        "lastModified": 1773098541,
-        "narHash": "sha256-FQzQfSTwCY5U+uu4m2xP1IUXPohGMNGOd0B7LsJ93YE=",
-        "owner": "davenicholson-xyz",
-        "repo": "pyvista",
-        "rev": "aaf9bf4ec6a05d82dec2b9fde8e996ed762911ad",
-        "type": "github"
-      },
-      "original": {
-        "owner": "davenicholson-xyz",
-        "repo": "pyvista",
-        "type": "github"
-      }
-    },
     "root": {
       "inputs": {
+        "govista": "govista",
         "home-manager": "home-manager",
-        "nixpkgs": "nixpkgs",
-        "nixvim": "nixvim",
-        "pyvista": "pyvista"
+        "nixpkgs": "nixpkgs_2",
+        "nixvim": "nixvim"
       }
     },
     "systems": {

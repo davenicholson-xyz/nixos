@@ -1,4 +1,4 @@
-{ config, pkgs, lib, pyvista, nixvim, ... }: 
+{ config, pkgs, lib, govista, nixvim, ... }:
 
 let 
 apiKey = lib.strings.trim(builtins.readFile "/home/dave/.secrets/wallhaven-api-key");
@@ -8,7 +8,7 @@ in
   imports = [
     ./modules/nixvim.nix
       ./modules/tmux.nix
-      ./modules/pyvista.nix
+      ./modules/govista.nix
   ];
 
   home.username = "dave";
@@ -33,7 +33,6 @@ in
       gh
       claude-code
       yazi
-      hyprlauncher
       spotify
 
       ripgrep
@@ -73,8 +72,6 @@ in
       rebuild = "nh os switch --impure";
       update = "nh os switch --impure -u";
       cleanup = "nh clean all --keep 3";
-      # update = "nix flake update --flake /home/dave/nixos && sudo nixos-rebuild switch --impure --flake /home/dave/nixos#nixos";
-      # rebuild = "sudo nixos-rebuild switch --impure --flake /home/dave/nixos#nixos";
     };
 
 
@@ -109,7 +106,7 @@ in
   }; 
 
 
-  programs.pyvista = {
+  programs.govista = {
     enable = true;
     settings = {
       username = "fatnic";
@@ -118,7 +115,6 @@ in
       purity = "110";
       script = "/home/dave/nixos/bin/setwallpaper";
       closeOnSelect = true;
-      thumbSize = "sm";
       minResolution = "2560x1440";
     };
   };

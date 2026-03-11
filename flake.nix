@@ -11,11 +11,11 @@
 
     };
 
-    pyvista.url = "github:davenicholson-xyz/pyvista";
+    govista.url = "github:davenicholson-xyz/govista";
     nixvim.url = "github:nix-community/nixvim";
   };
 
-  outputs = { self, nixpkgs, home-manager, pyvista, nixvim, ... }:
+  outputs = { self, nixpkgs, home-manager, govista, nixvim, ... }:
   {
     nixosConfigurations = {
       nixos = nixpkgs.lib.nixosSystem {
@@ -26,7 +26,7 @@
           {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
-            home-manager.extraSpecialArgs = { inherit pyvista; inherit nixvim; };
+            home-manager.extraSpecialArgs = { inherit govista; inherit nixvim; };
             home-manager.users.dave = import ./home.nix;
             home-manager.backupFileExtension = "bak";
           }
