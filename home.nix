@@ -27,7 +27,7 @@ in
   home.file.".config/quickshell".source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/nixos/config/quickshell";
 
   home.packages = with pkgs; [
-    brave
+      brave
       swww
       kitty
       gh
