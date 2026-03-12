@@ -43,6 +43,7 @@ in
       fastfetch
       trash-cli
       nh
+      btop
 
       nerd-fonts.jetbrains-mono
       nerd-fonts.sauce-code-pro
