@@ -9,12 +9,6 @@
     clock24 = true;
     historyLimit = 50000;
     keyMode = "vi";
-
-    extraConfig = ''
-      set -g renumber-windows on    
-      bind -n C-h previous-window
-      bind -n C-l next-window
-    '';
+    extraConfig = builtins.readFile /home/dave/nixos/config/tmux/.tmux.conf;
   };
-
 }
