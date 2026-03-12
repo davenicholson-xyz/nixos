@@ -34,6 +34,7 @@ in
       claude-code
       yazi
       spotify
+      thunderbird
 
       ripgrep
       jq
@@ -68,7 +69,10 @@ in
     shellAliases = {
       ll = "ls -l";
       lg = "lazygit";
+
       ehome = "nvim /home/dave/nixos/home.nix";
+      ehypr = "nvim /home/dave/nixos/config/hypr/hyprland.conf";
+
       rebuild = "nh os switch --impure";
       update = "nh os switch --impure -u";
       cleanup = "nh clean all --keep 3";
@@ -78,7 +82,7 @@ in
     initContent = ''
       autoload -Uz vcs_info
       precmd() { vcs_info }
-    zstyle ':vcs_info:git:*' formats ' (%b%u%c)'
+      zstyle ':vcs_info:git:*' formats ' (%b%u%c)'
       zstyle ':vcs_info:git:*' actionformats ' (%b|%a%u%c)'
       zstyle ':vcs_info:git:*' check-for-changes true
       zstyle ':vcs_info:git:*' unstagedstr '!'
