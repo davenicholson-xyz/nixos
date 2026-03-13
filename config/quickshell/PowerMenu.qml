@@ -14,6 +14,7 @@ Item {
     readonly property var actions: [
         { label: "Shutdown", icon: "icons/shutdown.svg", cmd: ["systemctl", "poweroff"] },
         { label: "Restart",  icon: "icons/restart.svg",  cmd: ["systemctl", "reboot"]  },
+        { label: "Windows",  icon: "icons/windows.svg",  cmd: ["systemctl", "reboot", "--boot-loader-entry=auto-windows"] },
         { label: "Lock",     icon: "icons/lock.svg",     cmd: ["loginctl", "lock-session"] },
         { label: "Logout",   icon: "icons/logout.svg",   cmd: ["hyprctl", "dispatch", "exit"] },
     ]
