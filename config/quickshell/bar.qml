@@ -38,6 +38,19 @@ PanelWindow {
         onPressed: launcherPill.toggle()
     }
 
+    GlobalShortcut {
+        appid: "quickshell"
+        name: "togglePowerMenu"
+        description: "Toggle power menu"
+        onPressed: powerMenu.menuOpen ? powerMenu.close() : powerMenu.open()
+    }
+
+    PowerMenu {
+        id: powerMenu
+        panelRoot: root
+        anchorItem: workspacePill
+    }
+
     SequentialAnimation {
         id: showAnim
         ParallelAnimation {
@@ -89,7 +102,7 @@ PanelWindow {
     anchors.right: true
     implicitHeight: 30
     color: root.colBg
-    WlrLayershell.keyboardFocus: launcherPill.launcherOpen ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+    WlrLayershell.keyboardFocus: (launcherPill.launcherOpen || powerMenu.menuOpen) ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
     Item {
         anchors.fill: parent
@@ -98,6 +111,7 @@ PanelWindow {
         anchors.rightMargin: 8
 
         Rectangle {
+            id: workspacePill
             anchors.centerIn: parent
             color: root.colPill
             radius: 12
