@@ -69,7 +69,8 @@ in
 
     shellAliases = {
       ll = "ls -l";
-      lg = "lazygit";
+      lg = "lazygit"; 
+      currentwp = ''xdg-open https://wallhaven.cc/w/$(swww query | grep -oP '(?<=image: )[^\s,]+' | cut -d"/" -f6 | cut -d. -f1)'';
 
       ehome = "nvim /home/dave/nixos/home.nix";
       ehypr = "nvim /home/dave/nixos/config/hypr/hyprland.conf";
@@ -119,7 +120,6 @@ in
       categories = "101";
       purity = "110";
       script = "/home/dave/nixos/bin/setwallpaper";
-      closeOnSelect = true;
       minResolution = "2560x1440";
     };
   };

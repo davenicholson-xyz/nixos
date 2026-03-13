@@ -16,8 +16,8 @@ let
       "min-resolution"  = cfg.settings.minResolution;
       script            = cfg.settings.script;
       output            = if cfg.settings.output then true else null;
-      "close-on-select" = if cfg.settings.closeOnSelect then true else null;
-    }
+      "keep-open"       = if cfg.settings.keepOpen then true else null;
+      }
   );
 
 in {
@@ -70,10 +70,10 @@ in {
         default = false;
         description = "Print selected wallpaper path to stdout";
       };
-      closeOnSelect = lib.mkOption {
+      keepOpen = lib.mkOption {
         type = lib.types.bool;
         default = false;
-        description = "Close window after selecting a wallpaper";
+        description = "Keep window open after selecting a wallpaper";
       };
     };
   };
