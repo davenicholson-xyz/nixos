@@ -123,6 +123,8 @@ powerManagement.enable = false;
     QML_IMPORT_PATH = "${pkgs.qt6.qt5compat}/lib/qt-6/qml";
   };
 
+  services.openssh.enable = true;
+
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   system.stateVersion = "25.11"; # Did you read the comment?
