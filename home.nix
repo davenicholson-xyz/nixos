@@ -118,7 +118,7 @@ in
       username = "fatnic";
       apiKey = apiKey;
       categories = "101";
-      purity = "110";
+      purity = "111";
       script = "/home/dave/nixos/bin/setwallpaper";
       minResolution = "2560x1440";
     };
