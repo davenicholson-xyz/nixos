@@ -1,4 +1,4 @@
-{ config, pkgs, lib, govista, nixvim, ... }:
+{ config, pkgs, lib, govista, nixvim, kvmux, ... }:
 
 let 
 apiKey = lib.strings.trim(builtins.readFile "/home/dave/.secrets/wallhaven-api-key");
@@ -9,6 +9,7 @@ in
     ./modules/nixvim.nix
       ./modules/tmux.nix
       ./modules/govista.nix
+      ./modules/kvmux.nix
   ];
 
   home.username = "dave";
@@ -44,6 +45,8 @@ in
       trash-cli
       nh
       btop
+
+      lan-mouse
 
       nerd-fonts.jetbrains-mono
       nerd-fonts.sauce-code-pro
@@ -111,6 +114,8 @@ in
     };
   }; 
 
+
+  programs.kvmux.enable = true;
 
   programs.govista = {
     enable = true;

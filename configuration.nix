@@ -125,6 +125,8 @@ powerManagement.enable = false;
 
   services.openssh.enable = true;
 
+  services.kvmux.enable = true;
+
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   networking.firewall.allowedTCPPorts = [ 7777 4242 ];
