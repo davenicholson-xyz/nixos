@@ -1,6 +1,7 @@
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.Hyprland
+import Quickshell.Io
 import QtQuick
 import QtQuick.Layouts
 import Qt5Compat.GraphicalEffects
@@ -19,6 +20,38 @@ PanelWindow {
     property int fontSize: 13
     property var wsIcons: ["icons/terminal.svg", "icons/browser.svg", "icons/folder.svg", "icons/music.svg"]
     property bool pillsVisible: false
+    property bool kvmConnected: false
+    property bool kvmRemote: false
+
+    Process {
+        id: kvmuxProc
+        command: ["sh", "-c",
+            "R=$(echo '{\"type\":\"status\"}' | /run/current-system/sw/bin/nc -U /tmp/kvmux.sock 2>/dev/null | head -1); " +
+            "[ -n \"$R\" ] && echo \"$R\" || echo '{\"connected\":false,\"remote\":false}'"
+        ]
+        running: true
+        stdout: SplitParser {
+            onRead: data => {
+                var line = data.trim()
+                if (!line) return
+                try {
+                    var obj = JSON.parse(line)
+                    root.kvmConnected = obj.connected === true
+                    root.kvmRemote = obj.remote === true
+                } catch (e) {
+                    root.kvmConnected = false
+                    root.kvmRemote = false
+                }
+            }
+        }
+    }
+
+    Timer {
+        interval: 2000
+        running: true
+        repeat: true
+        onTriggered: kvmuxProc.running = true
+    }
 
     GlobalShortcut {
         appid: "quickshell"
@@ -155,15 +188,40 @@ PanelWindow {
                         }
                     }
                 }
-            }
-        }
 
-        KvmuxPill {
-            id: kvmuxPill
-            panelRoot: root
-            anchors.left: workspacePill.right
-            anchors.leftMargin: 8
-            anchors.verticalCenter: workspacePill.verticalCenter
+                Rectangle {
+                    width: 4; height: 4
+                    radius: 2
+                    color: root.colWsEmpty
+                    anchors.verticalCenter: parent.verticalCenter
+                    visible: root.kvmConnected
+                }
+
+                Item {
+                    width: 14; height: 14
+                    anchors.verticalCenter: parent.verticalCenter
+                    visible: root.kvmConnected
+
+                    Image {
+                        id: kvmAppleIcon
+                        anchors.fill: parent
+                        source: "icons/apple.svg"
+                        smooth: true
+                        mipmap: true
+                        sourceSize.width: 14
+                        sourceSize.height: 14
+                        visible: false
+                        layer.enabled: true
+                    }
+
+                    ColorOverlay {
+                        anchors.fill: kvmAppleIcon
+                        source: kvmAppleIcon
+                        color: root.kvmRemote ? "#ffffff" : "#555555"
+                        Behavior on color { ColorAnimation { duration: 200 } }
+                    }
+                }
+            }
         }
 
         Row {

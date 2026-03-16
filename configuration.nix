@@ -13,14 +13,12 @@
   boot.kernelPackages = pkgs.linuxPackages_latest;
   boot.kernelParams = [ "usbcore.autosuspend=-1" ];
 
-services.upower.enable = false; # if you don't need it
-# or more targeted:
-powerManagement.enable = false;
-
+  services.upower.enable = false; # if you don't need it
+  powerManagement.enable = false;
 
   networking.hostName = "nixos"; # Define your hostname.
 
-    networking.networkmanager.enable = true;
+  networking.networkmanager.enable = true;
 
   time.timeZone = "Europe/London";
 
