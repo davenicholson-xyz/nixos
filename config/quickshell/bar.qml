@@ -158,6 +158,14 @@ PanelWindow {
             }
         }
 
+        KvmuxPill {
+            id: kvmuxPill
+            panelRoot: root
+            anchors.left: workspacePill.right
+            anchors.leftMargin: 8
+            anchors.verticalCenter: workspacePill.verticalCenter
+        }
+
         Row {
             anchors.left: parent.left
             anchors.verticalCenter: parent.verticalCenter

@@ -20,8 +20,12 @@ Rectangle {
 
     color: panelRoot.colPill
     radius: 12
-    width: 110
+    width: spotifyRow.width + 20
     height: spotifyRow.height + 10
+
+    Behavior on width {
+        NumberAnimation { duration: 300; easing.type: Easing.OutCubic }
+    }
 
     opacity: spotifyRunning ? 1 : 0
     visible: opacity > 0
@@ -76,6 +80,16 @@ Rectangle {
                 opacity: pill.spotifyStatus === "Paused" ? 0.4 : 1
                 Behavior on opacity { NumberAnimation { duration: 200 } }
             }
+        }
+
+        Item { width: 4; height: 1 }
+
+        Text {
+            textFormat: Text.RichText
+            text: "<b>" + pill.artistName + "</b>" + (pill.trackName ? " – " + pill.trackName : "")
+            color: panelRoot.colWsActive
+            font { family: panelRoot.fontFamily; pixelSize: panelRoot.fontSize - 2 }
+            anchors.verticalCenter: parent.verticalCenter
         }
     }
 

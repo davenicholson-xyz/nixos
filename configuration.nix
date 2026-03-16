@@ -127,6 +127,9 @@ powerManagement.enable = false;
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
+  networking.firewall.allowedTCPPorts = [ 7777 4242 ];
+
+
   system.stateVersion = "25.11"; # Did you read the comment?
 
 }
