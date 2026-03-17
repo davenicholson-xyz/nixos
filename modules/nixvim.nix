@@ -144,6 +144,12 @@ extraConfigLua = ''
         desc = "Delete buffer";
       };
     }
+    {
+  mode = "n";
+  key = "<Esc>";
+  action = "<cmd>nohlsearch<CR>";
+  options.desc = "Clear search highlight";
+}
     ];
   };
 }
