@@ -44,6 +44,7 @@ in
       yazi
       spotify
       thunderbird
+      mpv
 
       ripgrep
       jq
@@ -54,7 +55,6 @@ in
       nh
       btop
 
-      lan-mouse
 
       nerd-fonts.jetbrains-mono
       nerd-fonts.sauce-code-pro

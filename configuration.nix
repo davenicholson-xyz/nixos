@@ -111,11 +111,21 @@
       bat
       wlogout
       playerctl
+      tremc
 
       quickshell
       qt6.qt5compat
 
   ];
+
+  services.transmission = {
+  enable = true;
+  settings = {
+    download-dir = "/home/dave/Downloads";
+    rpc-bind-address = "127.0.0.1"; # Only allow local access
+  };
+};
+systemd.services.transmission.serviceConfig.ReadWritePaths = [ "/home/dave/Downloads" ];
 
   environment.sessionVariables = {
     QML_IMPORT_PATH = "${pkgs.qt6.qt5compat}/lib/qt-6/qml";

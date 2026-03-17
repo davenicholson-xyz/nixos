@@ -18,7 +18,7 @@ PanelWindow {
     property color colBarTrack: root.colWsEmpty
     property string fontFamily: "SauceCodePro Nerd Font"
     property int fontSize: 13
-    property var wsIcons: ["icons/terminal.svg", "icons/browser.svg", "icons/folder.svg", "icons/music.svg"]
+    property var wsIcons: ["icons/terminal.svg", "icons/browser.svg", "icons/video.svg", "icons/music.svg"]
     property bool pillsVisible: false
     property bool kvmConnected: false
     property bool kvmRemote: false
