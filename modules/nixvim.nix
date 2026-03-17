@@ -25,6 +25,13 @@
 
     globals.mapleader = " ";
 
+    diagnostics = {
+      virtual_text = true;   # inline messages at end of line
+      signs = true;          # gutter signs (✗ !)
+      underline = true;      # squiggly underlines
+      update_in_insert = false;  # only show after leaving insert mode
+    };
+
     plugins = {
       lualine.enable = true;
       telescope.enable = true;
@@ -50,14 +57,15 @@
         treesitter.enable = true;
         grammarPackages = with pkgs.vimPlugins.nvim-treesitter.builtGrammars; [
           bash
-            json
-            lua
-            nix
-            regex
-            toml
-            vim
-            xml
-            yaml
+          json
+          lua
+          nix
+          regex
+          toml
+          vim
+          xml
+          yaml
+          go
         ];
       };
       lsp = {
@@ -71,9 +79,20 @@
             installRustc = false;
           };
           nixd.enable = true;
+          gopls.enable = true;
         };
       };
     };
+
+extraConfigLua = ''
+    vim.diagnostic.config({
+      virtual_text = true,
+      signs = true,
+      underline = true,
+      update_in_insert = false,
+      severity_sort = true,
+    })
+  '';
 
     keymaps = [
 
