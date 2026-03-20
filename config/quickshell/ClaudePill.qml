@@ -12,7 +12,7 @@ Rectangle {
     color: panelRoot.colPill
     radius: 12
     width: 30
-    height: 23
+    height: iconItem.height + 10
 
     opacity: waiting ? 1 : 0
     visible: opacity > 0
@@ -30,6 +30,7 @@ Rectangle {
     onWaitingChanged: if (!waiting) iconOverlay.opacity = 1.0
 
     Item {
+        id: iconItem
         width: 13; height: 13
         anchors.centerIn: parent
 
@@ -55,7 +56,7 @@ Rectangle {
     // Poll for ~/.claude/waiting-for-input
     Process {
         id: checkProc
-        command: ["sh", "-c", "test -f $HOME/.claude/waiting-for-input && echo 1 || echo 0"]
+        command: ["sh", "-c", "test -f $HOME/.claude/waiting-for-input && pgrep -x claude > /dev/null && echo 1 || echo 0"]
         running: true
         stdout: SplitParser {
             onRead: data => { pill.waiting = data.trim() === "1" }
