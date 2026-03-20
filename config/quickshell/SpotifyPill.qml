@@ -66,19 +66,33 @@ Rectangle {
             }
         }
 
-        Rectangle {
-            width: 71; height: 3
-            radius: 2
+        Item {
+            id: vizContainer
+            width: 71; height: 10
             anchors.verticalCenter: parent.verticalCenter
-            color: panelRoot.colBarTrack
 
-            Rectangle {
-                width: parent.width * pill.trackProgress
-                height: parent.height
-                radius: 2
-                color: panelRoot.colWsActive
-                opacity: pill.spotifyStatus === "Paused" ? 0.4 : 1
-                Behavior on opacity { NumberAnimation { duration: 200 } }
+            Repeater {
+                model: 12
+                delegate: Rectangle {
+                    id: vizBar
+                    width: 4; height: 2
+                    x: index * 6 + 0.5
+                    y: vizContainer.height - height
+                    color: panelRoot.colWsActive
+                    radius: 1
+                    opacity: pill.spotifyStatus === "Paused" ? 0.3 : 1
+
+                    Behavior on height { NumberAnimation { duration: 180; easing.type: Easing.InOutSine } }
+                    Behavior on opacity { NumberAnimation { duration: 200 } }
+
+                    Timer {
+                        interval: 120 + index * 23
+                        running: pill.spotifyStatus === "Playing"
+                        repeat: true
+                        onTriggered: vizBar.height = 1 + Math.random() * 9
+                        onRunningChanged: if (!running) vizBar.height = 2
+                    }
+                }
             }
         }
 
