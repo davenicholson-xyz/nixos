@@ -208,6 +208,7 @@ Rectangle {
             height: 300
             radius: 20
             clip: true
+            layer.enabled: true
             color: panelRoot.colPill
 
             // Full-bleed album art background
