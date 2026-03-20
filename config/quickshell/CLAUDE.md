@@ -4,55 +4,64 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-This is a [Quickshell](https://quickshell.outfoxxed.me/) status bar configuration written in QML. Quickshell is a Wayland shell framework. The bar targets Hyprland as the window manager.
-
-## Running
-
-Quickshell loads `bar.qml` directly — there is no build step. To reload after changes:
-
-```sh
-quickshell -p /path/to/this/dir   # initial launch
-# or kill and relaunch the quickshell process to pick up changes
-```
+A [Quickshell](https://quickshell.outfoxxed.me/) status bar written in QML, targeting Hyprland. No build step — Quickshell loads `bar.qml` directly. Reload by killing and relaunching the quickshell process.
 
 ## Architecture
 
-Everything lives in a single file, `bar.qml`, as one `PanelWindow` with:
+`bar.qml` is the root `PanelWindow`. It owns all shared state (colors, font, `pillsVisible`, `kvmConnected`) and instantiates components as children of a single full-width `Item`.
 
-- **Left side (implicit):** nothing — workspace pill is centered
-- **Center:** Workspace switcher pill — 4 workspaces with per-workspace SVG icons, colored by state (active/occupied/empty), clickable to switch via `Hyprland.dispatch`
-- **Right side:** System info pills (CPU, RAM, disk) + dot toggle + clock pill
+### Layout
 
-### Info pills (CPU / RAM / disk)
+- **Left:** `SpotifyPill` + `LauncherPill` (Row, anchored left)
+- **Center:** `workspacePill` — always `anchors.centerIn: parent`; never push it into a layout or it loses true centering
+- **Just left of center:** `ClaudePill` — anchored `right: workspacePill.left` so it floats without affecting centering
+- **Right:** `CpuPill`, `RamPill`, `DrivePill`, `NetworkPill` (staggered show/hide) + arrow toggle + `ClockPill`
 
-Each pill is a `Rectangle` with:
-- An SVG icon colored via `ColorOverlay`
-- A thin progress bar (`width: 44, height: 3`) filled proportionally to usage
-- A `Process` + `Timer` polling system data from `/proc/stat`, `/proc/meminfo`, `df`, and `/sys/class/thermal/`
-- A `MouseArea` for hover detection
-- An associated `PopupWindow` anchored below the pill, shown on hover
+### Component conventions
+
+Every pill is a `Rectangle` that takes `required property var panelRoot` to access shared colors and font. Heights follow `height: contentItem.height + 10`. SVG icons always use `Image` (with `visible: false; layer.enabled: true`) + `ColorOverlay` to tint at runtime.
+
+Popups use `PopupWindow` anchored `Edges.Bottom` to the pill, with `color: "transparent"` on the window and a `Rectangle` inside with `topMargin: 8` for the visual gap.
+
+For rounded popup corners that correctly clip child content, set both `radius`, `clip: true`, and `layer.enabled: true` on the popup's inner `Rectangle`.
 
 ### Show/hide animation
 
-Pills start hidden (`opacity: 0`, `xOff: 24`). Toggle is exposed two ways:
-1. `GlobalShortcut` (appid `quickshell`, name `togglePills`)
-2. A small dot `Rectangle` on the right
-
-`showAnim` / `hideAnim` are `SequentialAnimation`s that stagger the three pills in/out using `NumberAnimation` on `opacity` and the custom `xOff` property (applied via `Translate`).
+`pillsVisible` in `bar.qml` controls the right-side info pills. `showAnim`/`hideAnim` are `SequentialAnimation`s that stagger pills using `NumberAnimation` on `opacity` and a custom `xOff` property applied via `Translate`. Each pill starts at `opacity: 0`, `xOff: 24`.
 
 ### Color scheme
 
-All colors are properties on `root` (`colBg`, `colPill`, `colWsActive`, `colWsOccupied`, `colWsEmpty`, `colClock`, `colBarTrack`). Threshold colors for high usage are inline: `>= 80%` → yellow `#e0c94a`, `>= 95%` → red `#e05252`.
+All colors are properties on `root`: `colBg`, `colPill`, `colWsActive`, `colWsOccupied`, `colWsEmpty`, `colClock`, `colBarTrack`. Threshold colors for high usage are defined inline per pill: `>= 80%` → `#e0c94a`, `>= 95%` → `#e05252`.
 
-### SVG icons
+### Data sources
 
-`wsIcons` maps workspace index to SVG filename. All icons use the same `Image` + `ColorOverlay` pattern to tint them at runtime.
+| Pill | Source |
+|------|--------|
+| CPU | `/proc/stat` polled via `Process` |
+| RAM | `/proc/meminfo` |
+| Disk | `df` |
+| Network | `/proc/net/dev` |
+| Spotify | `playerctl -p spotify` + `cava` for visualizer |
+| Claude | `~/.claude/waiting-for-input` flag file + `pgrep -x claude` |
 
-## Key Quickshell APIs used
+### SpotifyPill specifics
+
+- Runs `cava` as a subprocess (only while `status === "Playing"`) reading from `cava.cfg`
+- `cava.cfg` uses `bars = 24, channels = mono` — the QML takes `slice(0, 12)` to get the non-mirrored half
+- Popup shows full-bleed album art with a gradient scrim and info overlay
+
+### ClaudePill specifics
+
+Shows and pulses when `~/.claude/waiting-for-input` exists **and** a `claude` process is running. The flag is written/cleared by hooks in `~/.claude/settings.json`:
+- `Notification` hook → `touch ~/.claude/waiting-for-input`
+- `PreToolUse`, `PostToolUse`, `Stop` hooks → `rm -f ~/.claude/waiting-for-input`
+
+## Key Quickshell APIs
 
 - `PanelWindow` — anchored top bar
 - `PopupWindow` — tooltip popups anchored to pill items
-- `GlobalShortcut` — global keybind registration with Wayland compositor
-- `Process` + `SplitParser` — spawning shell commands and reading stdout line-by-line
-- `Hyprland.workspaces`, `Hyprland.focusedWorkspace`, `Hyprland.dispatch` — workspace state and control
+- `GlobalShortcut` — global keybind registration
+- `Process` + `SplitParser` — spawn shell commands, read stdout line-by-line
+- `Hyprland.workspaces`, `Hyprland.focusedWorkspace`, `Hyprland.dispatch` — workspace state/control
 - `Qt5Compat.GraphicalEffects.ColorOverlay` — SVG icon tinting
+- `Qt5Compat.GraphicalEffects.OpacityMask` — rounded image clipping (used in pill thumbnails)
