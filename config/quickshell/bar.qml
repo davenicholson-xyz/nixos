@@ -287,9 +287,7 @@ RowLayout {
                 }
             }
 
-            EcgPill { id: ecgPill; panelRoot: root; Layout.alignment: Qt.AlignVCenter }
-
-            Rectangle {
+Rectangle {
                 color: root.colPill
                 radius: 12
                 width: clockRow.width + 16

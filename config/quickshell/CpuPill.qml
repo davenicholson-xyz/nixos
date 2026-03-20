@@ -20,11 +20,55 @@ Rectangle {
     property var _corePrevIdles: []
     property var _coreBuf: []
 
+    property real beatPhase: 0.0
+    property var ecgSamples: []
+    property int ecgMaxSamples: 80
+
+    function ecgSample(phase) {
+        var t
+        if (phase >= 0.08 && phase < 0.18) {
+            t = (phase - 0.08) / 0.10
+            return 0.18 * Math.sin(Math.PI * t)
+        }
+        if (phase >= 0.26 && phase < 0.30) {
+            t = (phase - 0.26) / 0.04
+            return -0.12 * Math.sin(Math.PI * t)
+        }
+        if (phase >= 0.30 && phase < 0.38) {
+            t = (phase - 0.30) / 0.08
+            return Math.sin(Math.PI * t)
+        }
+        if (phase >= 0.38 && phase < 0.43) {
+            t = (phase - 0.38) / 0.05
+            return -0.18 * Math.sin(Math.PI * t)
+        }
+        if (phase >= 0.48 && phase < 0.68) {
+            t = (phase - 0.48) / 0.20
+            return 0.28 * Math.sin(Math.PI * t)
+        }
+        return 0.0
+    }
+
+    Timer {
+        interval: 40
+        running: true
+        repeat: true
+        onTriggered: {
+            var bpm = 50 + (pill.cpuPct / 100) * 110
+            pill.beatPhase = (pill.beatPhase + (bpm / 60) * 0.04) % 1.0
+            var arr = pill.ecgSamples.slice()
+            arr.push(pill.ecgSample(pill.beatPhase))
+            if (arr.length > pill.ecgMaxSamples) arr.shift()
+            pill.ecgSamples = arr
+            ecgCanvas.requestPaint()
+        }
+    }
+
     opacity: 0
     transform: Translate { x: pill.xOff }
     color: panelRoot.colPill
     radius: 12
-    width: 76
+    width: 96
     height: cpuRow.height + 10
 
     Row {
@@ -55,18 +99,46 @@ Rectangle {
             }
         }
 
-        Rectangle {
-            width: 44
-            height: 3
-            radius: 2
+        Canvas {
+            id: ecgCanvas
+            width: 64
+            height: 13
             anchors.verticalCenter: parent.verticalCenter
-            color: panelRoot.colBarTrack
 
-            Rectangle {
-                width: parent.width * (pill.cpuPct / 100)
-                height: parent.height
-                radius: 2
-                color: pill.cpuPct >= 95 ? "#e05252" : pill.cpuPct >= 80 ? "#e0c94a" : panelRoot.colWsActive
+            onPaint: {
+                var ctx = getContext("2d")
+                ctx.clearRect(0, 0, width, height)
+
+                var s = pill.ecgSamples
+                if (s.length < 2) return
+
+                var midY = height / 2
+                var amp  = height * 0.44
+
+                var lineColor = pill.cpuPct >= 95 ? "#e05252"
+                              : pill.cpuPct >= 80 ? "#e0c94a"
+                              : "#4ae09a"
+
+                ctx.strokeStyle = lineColor
+                ctx.lineWidth = 1.5
+                ctx.lineJoin = "round"
+                ctx.shadowColor = lineColor
+                ctx.shadowBlur = 5
+
+                ctx.beginPath()
+                for (var i = 0; i < s.length; i++) {
+                    var x = (i / (pill.ecgMaxSamples - 1)) * width
+                    var y = midY - s[i] * amp
+                    if (i === 0) ctx.moveTo(x, y)
+                    else ctx.lineTo(x, y)
+                }
+                ctx.stroke()
+
+                var grad = ctx.createLinearGradient(0, 0, width * 0.25, 0)
+                grad.addColorStop(0, Qt.rgba(0, 0, 0, 0.8))
+                grad.addColorStop(1, Qt.rgba(0, 0, 0, 0))
+                ctx.fillStyle = grad
+                ctx.fillRect(0, 0, width * 0.25, height)
             }
         }
     }
