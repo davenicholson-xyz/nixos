@@ -242,7 +242,7 @@ PanelWindow {
             }
         }
 
-        RowLayout {
+RowLayout {
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
             spacing: 8
@@ -286,6 +286,8 @@ PanelWindow {
                     }
                 }
             }
+
+            EcgPill { id: ecgPill; panelRoot: root; Layout.alignment: Qt.AlignVCenter }
 
             Rectangle {
                 color: root.colPill
