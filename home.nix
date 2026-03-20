@@ -81,6 +81,7 @@ in
     shellAliases = {
       ll = "ls -l";
       lg = "lazygit"; 
+      ssh = "ssh-hypr";
       currentwp = ''xdg-open https://wallhaven.cc/w/$(swww query | grep -oP '(?<=image: )[^\s,]+' | cut -d"/" -f6 | cut -d. -f1)'';
 
       ehome = "nvim /home/dave/nixos/home.nix";
@@ -93,15 +94,15 @@ in
 
 
     initContent = ''
-      autoload -Uz vcs_info
-      precmd() { vcs_info }
-      zstyle ':vcs_info:git:*' formats ' (%b%u%c)'
-      zstyle ':vcs_info:git:*' actionformats ' (%b|%a%u%c)'
-      zstyle ':vcs_info:git:*' check-for-changes true
-      zstyle ':vcs_info:git:*' unstagedstr '!'
-      zstyle ':vcs_info:git:*' stagedstr '+'
-      setopt PROMPT_SUBST
-      PROMPT='%F{cyan}%~%f%F{yellow}''${vcs_info_msg_0_}%f %(?.%F{green}❯%f.%F{red}❯%f) '
+autoload -Uz vcs_info
+precmd() { vcs_info }
+zstyle ':vcs_info:git:*' formats ' (%b%u%c)'
+zstyle ':vcs_info:git:*' actionformats ' (%b|%a%u%c)'
+zstyle ':vcs_info:git:*' check-for-changes true
+zstyle ':vcs_info:git:*' unstagedstr '!'
+zstyle ':vcs_info:git:*' stagedstr '+'
+setopt PROMPT_SUBST
+PROMPT='%F{cyan}%~%f%F{yellow}''${vcs_info_msg_0_}%f %(?.%F{green}❯%f.%F{red}❯%f) '
       '';
 
   };

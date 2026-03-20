@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+# Get the address of the currently focused window
+WIN_ADDR=$(hyprctl activewindow -j | jq -r '.address')
+
+# Set orange border, restore on exit
+hyprctl dispatch setprop address:${WIN_ADDR} active_border_color 0xffff8800 > /dev/null
+kitten ssh "$@"
+hyprctl dispatch setprop address:${WIN_ADDR} active_border_color unset > /dev/null
