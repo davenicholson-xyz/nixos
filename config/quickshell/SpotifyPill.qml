@@ -19,6 +19,20 @@ Rectangle {
     property real _durSecs: 0
     property string albumName: ""
     property var cavaValues: [0,0,0,0,0,0,0,0,0,0,0,0]
+    property int vizScheme: 0
+    readonly property int vizSchemeCount: 6
+
+    function vizColor(i) {
+        var t = i / 11
+        switch (vizScheme) {
+            case 0: return Qt.hsla(t, 0.85, 0.65, 1.0)                          // rainbow
+            case 1: return Qt.hsla(t * 0.17, 0.95, 0.55 + t * 0.1, 1.0)        // fire: red → orange → yellow
+            case 2: return Qt.hsla(0.5 + t * 0.17, 0.8, 0.55 + t * 0.1, 1.0)  // ocean: cyan → blue
+            case 3: return Qt.hsla(0.72 + t * 0.18, 0.85, 0.6 + t * 0.1, 1.0) // neon: purple → pink
+            case 4: return Qt.hsla(0.33, 0.75, 0.28 + t * 0.38, 1.0)           // matrix: dark → bright green
+            case 5: return Qt.hsla(0, 0, 0.45 + t * 0.45, 1.0)                 // mono: grey → white
+        }
+    }
 
     color: panelRoot.colPill
     radius: 12
@@ -80,13 +94,20 @@ Rectangle {
                     height: Math.max(1, pill.cavaValues[index] || 0)
                     x: index * 6 + 0.5
                     y: vizContainer.height - height
-                    color: Qt.hsla(index / 12, 0.85, 0.65, 1.0)
+                    color: pill.vizColor(index)
                     radius: 1
                     opacity: pill.spotifyStatus === "Paused" ? 0.3 : 1
 
                     Behavior on height { NumberAnimation { duration: 50; easing.type: Easing.OutCubic } }
+                    Behavior on color  { ColorAnimation  { duration: 300; easing.type: Easing.OutCubic } }
                     Behavior on opacity { NumberAnimation { duration: 200 } }
                 }
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                cursorShape: Qt.PointingHandCursor
+                onClicked: pill.vizScheme = (pill.vizScheme + 1) % pill.vizSchemeCount
             }
         }
 
@@ -99,7 +120,7 @@ Rectangle {
         }
     }
 
-    MouseArea { id: spotifyHover; anchors.fill: parent; hoverEnabled: true }
+    MouseArea { id: spotifyHover; anchors.fill: parent; hoverEnabled: true; propagateComposedEvents: true; onClicked: mouse.accepted = false }
 
     Process {
         id: spotifyProc
