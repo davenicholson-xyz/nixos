@@ -21,42 +21,17 @@ Rectangle {
     property string ssid: ""
     property var _infoBuf: []
     property real maxSpeed: 10485760
-    property var particles: []
-
-    Component.onCompleted: {
-        var arr = []
-        for (var i = 0; i < 14; i++) {
-            var isRx = i < 7
-            arr.push({
-                x:     Math.random() * 66,
-                y:     1.5 + Math.random() * 10,
-                dir:   isRx ? -1 : 1,
-                isRx:  isRx,
-                alpha: 0.2
-            })
-        }
-        pill.particles = arr
-    }
+    property var rxHistory: []
+    property var txHistory: []
+    property int historyMax: 80
 
     Timer {
         interval: 40
         running: true
         repeat: true
         onTriggered: {
-            var W = 66
-            var arr = pill.particles.slice()
-            for (var i = 0; i < arr.length; i++) {
-                var p = { x: arr[i].x, y: arr[i].y, dir: arr[i].dir, isRx: arr[i].isRx, alpha: arr[i].alpha }
-                var spd = p.isRx ? pill.rxSpeed : pill.txSpeed
-                var vel = Math.max(0.4, Math.min(5, spd / 131072))
-                p.x += p.dir * vel
-                if (p.x < 0)  p.x = W
-                if (p.x > W)  p.x = 0
-                var targetAlpha = spd > 1024 ? 1.0 : 0.2
-                p.alpha += (targetAlpha - p.alpha) * 0.06
-                arr[i] = p
-            }
-            pill.particles = arr
+            var rx = pill.rxHistory.slice(); rx.push(pill.rxSpeed); if (rx.length > pill.historyMax) rx.shift(); pill.rxHistory = rx
+            var tx = pill.txHistory.slice(); tx.push(pill.txSpeed); if (tx.length > pill.historyMax) tx.shift(); pill.txHistory = tx
             netCanvas.requestPaint()
         }
     }
@@ -130,20 +105,93 @@ Rectangle {
                 var ctx = getContext("2d")
                 ctx.clearRect(0, 0, width, height)
 
-                for (var i = 0; i < pill.particles.length; i++) {
-                    var p = pill.particles[i]
-                    var spd = p.isRx ? pill.rxSpeed : pill.txSpeed
-                    var color = p.isRx ? "#4ac4e0" : "#4ae09a"
+                var logMax = Math.log1p(pill.maxSpeed)
+                var half   = (height - 1) / 2  // ~6px per channel
+                var midY   = height / 2
+                var n      = pill.historyMax
 
-                    ctx.beginPath()
-                    ctx.arc(p.x, p.y, 1.5, 0, Math.PI * 2)
-                    ctx.fillStyle   = color
-                    ctx.globalAlpha = p.alpha
-                    ctx.shadowColor = color
-                    ctx.shadowBlur  = p.alpha * 5
-                    ctx.fill()
+                function norm(spd) {
+                    return Math.log1p(spd) / logMax * (half - 1)
                 }
-                ctx.globalAlpha = 1.0
+
+                function sparkColor(spd, baseColor) {
+                    var pct = spd / pill.maxSpeed * 100
+                    return pct >= 80 ? "#e05252" : pct >= 40 ? "#e0c94a" : baseColor
+                }
+
+                function drawSparkline(history, baseY, up, color) {
+                    if (history.length < 2) return
+                    var curSpd = history[history.length - 1]
+                    var glow   = norm(curSpd) / (half - 1)
+
+                    // Filled area under the line
+                    ctx.beginPath()
+                    ctx.moveTo(0, baseY)
+                    for (var i = 0; i < history.length; i++) {
+                        var x = (i / (n - 1)) * width
+                        var h = norm(history[i])
+                        ctx.lineTo(x, up ? baseY - h : baseY + h)
+                    }
+                    ctx.lineTo(width, baseY)
+                    ctx.closePath()
+                    var grad = ctx.createLinearGradient(0, up ? baseY - half : baseY, 0, baseY)
+                    grad.addColorStop(0, Qt.rgba(
+                        parseInt(color.slice(1,3),16)/255,
+                        parseInt(color.slice(3,5),16)/255,
+                        parseInt(color.slice(5,7),16)/255,
+                        0.25))
+                    grad.addColorStop(1, Qt.rgba(0,0,0,0))
+                    ctx.fillStyle = grad
+                    ctx.fill()
+
+                    // Line on top
+                    ctx.beginPath()
+                    for (var j = 0; j < history.length; j++) {
+                        var lx = (j / (n - 1)) * width
+                        var lh = norm(history[j])
+                        var ly = up ? baseY - lh : baseY + lh
+                        if (j === 0) ctx.moveTo(lx, ly)
+                        else         ctx.lineTo(lx, ly)
+                    }
+                    ctx.strokeStyle = color
+                    ctx.lineWidth   = 1.2
+                    ctx.lineJoin    = "round"
+                    ctx.shadowColor = color
+                    ctx.shadowBlur  = 1 + glow * 5
+                    ctx.stroke()
+                    ctx.shadowBlur  = 0
+                }
+
+                // Faint centre divider
+                ctx.beginPath()
+                ctx.moveTo(0, midY); ctx.lineTo(width, midY)
+                ctx.strokeStyle = Qt.rgba(1, 1, 1, 0.07)
+                ctx.lineWidth = 1
+                ctx.stroke()
+
+                drawSparkline(pill.rxHistory, midY, true,  sparkColor(pill.rxSpeed, "#4ac4e0"))
+                drawSparkline(pill.txHistory, midY, false, sparkColor(pill.txSpeed, "#e07840"))
+
+                // ↓ ↑ labels on right edge
+                ctx.font = "6px monospace"
+                ctx.textAlign = "right"
+                ctx.fillStyle = Qt.rgba(
+                    parseInt(sparkColor(pill.rxSpeed,"#4ac4e0").slice(1,3),16)/255,
+                    parseInt(sparkColor(pill.rxSpeed,"#4ac4e0").slice(3,5),16)/255,
+                    parseInt(sparkColor(pill.rxSpeed,"#4ac4e0").slice(5,7),16)/255, 0.7)
+                ctx.fillText("↓", width - 1, midY - 1)
+                ctx.fillStyle = Qt.rgba(
+                    parseInt(sparkColor(pill.txSpeed,"#e07840").slice(1,3),16)/255,
+                    parseInt(sparkColor(pill.txSpeed,"#e07840").slice(3,5),16)/255,
+                    parseInt(sparkColor(pill.txSpeed,"#e07840").slice(5,7),16)/255, 0.7)
+                ctx.fillText("↑", width - 1, midY + 7)
+
+                // Left-edge fade
+                var fade = ctx.createLinearGradient(0, 0, width * 0.18, 0)
+                fade.addColorStop(0, Qt.rgba(0, 0, 0, 0.9))
+                fade.addColorStop(1, Qt.rgba(0, 0, 0, 0))
+                ctx.fillStyle = fade
+                ctx.fillRect(0, 0, width * 0.18, height)
             }
         }
     }
