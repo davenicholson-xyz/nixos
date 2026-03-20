@@ -194,8 +194,8 @@ Rectangle {
 
     PopupWindow {
         visible: spotifyHover.containsMouse && pill.spotifyRunning
-        implicitWidth: 290
-        implicitHeight: spotifyPopupRect.height + 8
+        implicitWidth: 300
+        implicitHeight: 308
         color: "transparent"
         anchor.window: panelRoot
         anchor.item: pill
@@ -205,93 +205,85 @@ Rectangle {
         Rectangle {
             id: spotifyPopupRect
             anchors { left: parent.left; right: parent.right; top: parent.top; topMargin: 8 }
-            height: spotifyPopupContent.implicitHeight + 24
+            height: 300
+            radius: 20
+            clip: true
             color: panelRoot.colPill
-            radius: 10
 
-            Column {
-                id: spotifyPopupContent
-                anchors { left: parent.left; right: parent.right; top: parent.top; margins: 12 }
-                spacing: 10
+            // Full-bleed album art background
+            Image {
+                id: popupArtImg
+                anchors.fill: parent
+                source: pill.artUrl
+                fillMode: Image.PreserveAspectCrop
+                smooth: true
+                mipmap: true
+            }
 
-                Row {
-                    width: parent.width
-                    spacing: 12
-
-                    Item {
-                        width: 72; height: 72
-                        anchors.verticalCenter: parent.verticalCenter
-
-                        Image {
-                            id: popupArtImg
-                            anchors.fill: parent
-                            source: pill.artUrl
-                            fillMode: Image.PreserveAspectCrop
-                            smooth: true
-                            mipmap: true
-                            visible: false
-                            layer.enabled: true
-                        }
-                        Rectangle {
-                            id: popupArtMask
-                            anchors.fill: parent
-                            radius: 8
-                            visible: false
-                            layer.enabled: true
-                        }
-                        OpacityMask {
-                            anchors.fill: parent
-                            source: popupArtImg
-                            maskSource: popupArtMask
-                        }
-                    }
-
-                    Column {
-                        spacing: 3
-                        anchors.verticalCenter: parent.verticalCenter
-                        width: parent.width - 72 - parent.spacing
-
-                        Text {
-                            text: pill.trackName
-                            color: panelRoot.colWsActive
-                            font { family: panelRoot.fontFamily; pixelSize: panelRoot.fontSize; bold: true }
-                            elide: Text.ElideRight
-                            width: parent.width
-                        }
-                        Text {
-                            text: pill.artistName
-                            color: panelRoot.colWsOccupied
-                            font { family: panelRoot.fontFamily; pixelSize: panelRoot.fontSize - 2 }
-                            elide: Text.ElideRight
-                            width: parent.width
-                        }
-                        Text {
-                            text: pill.albumName
-                            color: panelRoot.colWsEmpty
-                            font { family: panelRoot.fontFamily; pixelSize: panelRoot.fontSize - 2 }
-                            elide: Text.ElideRight
-                            width: parent.width
-                        }
-
-                        Item { width: 1; height: 3 }
-
-                        Rectangle {
-                            width: statusLabel.width + 10
-                            height: statusLabel.height + 5
-                            radius: 4
-                            color: pill.spotifyStatus === "Playing" ? "#1db954" : "#444444"
-                            Behavior on color { ColorAnimation { duration: 200 } }
-
-                            Text {
-                                id: statusLabel
-                                anchors.centerIn: parent
-                                text: pill.spotifyStatus === "Playing" ? "▶  Playing" : "⏸  Paused"
-                                color: "#ffffff"
-                                font { family: panelRoot.fontFamily; pixelSize: panelRoot.fontSize - 3 }
-                            }
-                        }
-                    }
+            // Gradient scrim so overlay text is readable
+            Rectangle {
+                anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
+                height: 160
+                gradient: Gradient {
+                    orientation: Gradient.Vertical
+                    GradientStop { position: 0.0; color: "transparent" }
+                    GradientStop { position: 1.0; color: Qt.rgba(0, 0, 0, 0.72) }
                 }
+            }
+
+            // Play/pause icon — top left
+            Item {
+                anchors { top: parent.top; left: parent.left; topMargin: 12; leftMargin: 12 }
+                width: 22; height: 22
+
+                Image {
+                    id: statusIcon
+                    anchors.fill: parent
+                    source: pill.spotifyStatus === "Playing"
+                        ? Qt.resolvedUrl("icons/play.svg")
+                        : Qt.resolvedUrl("icons/pause.svg")
+                    fillMode: Image.PreserveAspectFit
+                    smooth: true
+                    mipmap: true
+                    visible: false
+                    layer.enabled: true
+                }
+                ColorOverlay {
+                    anchors.fill: statusIcon
+                    source: statusIcon
+                    color: "#ffffff"
+                }
+            }
+
+            // Info overlay anchored to bottom
+            Column {
+                id: spotifyOverlay
+                anchors { left: parent.left; right: parent.right; bottom: parent.bottom; margins: 14; bottomMargin: 12 }
+                spacing: 6
+
+                Text {
+                    text: pill.trackName
+                    color: "#ffffff"
+                    font { family: panelRoot.fontFamily; pixelSize: panelRoot.fontSize; bold: true }
+                    elide: Text.ElideRight
+                    width: parent.width
+                    style: Text.Raised; styleColor: "#00000088"
+                }
+                Text {
+                    text: pill.artistName
+                    color: "#dddddd"
+                    font { family: panelRoot.fontFamily; pixelSize: panelRoot.fontSize - 2 }
+                    elide: Text.ElideRight
+                    width: parent.width
+                }
+                Text {
+                    text: pill.albumName
+                    color: "#aaaaaa"
+                    font { family: panelRoot.fontFamily; pixelSize: panelRoot.fontSize - 2 }
+                    elide: Text.ElideRight
+                    width: parent.width
+                }
+
 
                 Column {
                     width: parent.width
@@ -301,7 +293,7 @@ Rectangle {
                         width: parent.width
                         height: 3
                         radius: 2
-                        color: panelRoot.colBarTrack
+                        color: Qt.rgba(1, 1, 1, 0.25)
 
                         Rectangle {
                             width: parent.width * pill.trackProgress
@@ -319,13 +311,13 @@ Rectangle {
                         Text {
                             id: posLabel
                             text: pill.posStr
-                            color: panelRoot.colWsEmpty
+                            color: "#aaaaaa"
                             font { family: panelRoot.fontFamily; pixelSize: panelRoot.fontSize - 3 }
                         }
                         Text {
                             anchors.right: parent.right
                             text: pill.durStr
-                            color: panelRoot.colWsEmpty
+                            color: "#aaaaaa"
                             font { family: panelRoot.fontFamily; pixelSize: panelRoot.fontSize - 3 }
                         }
                     }
