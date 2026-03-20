@@ -8,7 +8,7 @@ Rectangle {
     id: pill
     required property var panelRoot
 
-    property real xOff: 24
+    property real xOff: 0
     property real rxSpeed: 0
     property real txSpeed: 0
     property real totalRx: 0
@@ -20,13 +20,52 @@ Rectangle {
     property string ip: ""
     property string ssid: ""
     property var _infoBuf: []
-    property real maxSpeed: 10485760  // 10 MB/s reference for bar
+    property real maxSpeed: 10485760
+    property var particles: []
 
-    opacity: 0
+    Component.onCompleted: {
+        var arr = []
+        for (var i = 0; i < 14; i++) {
+            var isRx = i < 7
+            arr.push({
+                x:     Math.random() * 66,
+                y:     1.5 + Math.random() * 10,
+                dir:   isRx ? -1 : 1,
+                isRx:  isRx,
+                alpha: 0.2
+            })
+        }
+        pill.particles = arr
+    }
+
+    Timer {
+        interval: 40
+        running: true
+        repeat: true
+        onTriggered: {
+            var W = 66
+            var arr = pill.particles.slice()
+            for (var i = 0; i < arr.length; i++) {
+                var p = { x: arr[i].x, y: arr[i].y, dir: arr[i].dir, isRx: arr[i].isRx, alpha: arr[i].alpha }
+                var spd = p.isRx ? pill.rxSpeed : pill.txSpeed
+                var vel = Math.max(0.4, Math.min(5, spd / 131072))
+                p.x += p.dir * vel
+                if (p.x < 0)  p.x = W
+                if (p.x > W)  p.x = 0
+                var targetAlpha = spd > 1024 ? 1.0 : 0.2
+                p.alpha += (targetAlpha - p.alpha) * 0.06
+                arr[i] = p
+            }
+            pill.particles = arr
+            netCanvas.requestPaint()
+        }
+    }
+
+    opacity: 1
     transform: Translate { x: pill.xOff }
     color: panelRoot.colPill
     radius: 12
-    width: 80
+    width: 100
     height: 23
 
     function formatSpeed(bps) {
@@ -54,18 +93,12 @@ Rectangle {
         return b + " B"
     }
 
-    Item {
-        anchors {
-            left: parent.left; right: parent.right
-            leftMargin: 8; rightMargin: 8
-            verticalCenter: parent.verticalCenter
-        }
-        height: 13
+    Row {
+        anchors.centerIn: parent
+        spacing: 5
 
         Item {
-            id: netIconItem
             width: 13; height: 13
-            anchors.left: parent.left
             anchors.verticalCenter: parent.verticalCenter
 
             Image {
@@ -87,31 +120,31 @@ Rectangle {
             }
         }
 
-        Row {
-            anchors.left: netIconItem.right
-            anchors.leftMargin: 5
+        Canvas {
+            id: netCanvas
+            width: 66
+            height: 13
             anchors.verticalCenter: parent.verticalCenter
-            spacing: 1
 
-            Text {
-                text: "↑"
-                color: pill.dotColor(pill.txSpeed)
-                font { family: panelRoot.fontFamily; pixelSize: panelRoot.fontSize - 1 }
-            }
-            Text {
-                text: "↓"
-                color: pill.dotColor(pill.rxSpeed)
-                font { family: panelRoot.fontFamily; pixelSize: panelRoot.fontSize - 1 }
-            }
-        }
+            onPaint: {
+                var ctx = getContext("2d")
+                ctx.clearRect(0, 0, width, height)
 
-        Text {
-            anchors.right: parent.right
-            anchors.verticalCenter: parent.verticalCenter
-            horizontalAlignment: Text.AlignRight
-            text: pill.formatSpeedShort(pill.rxSpeed)
-            color: panelRoot.colWsActive
-            font { family: panelRoot.fontFamily; pixelSize: panelRoot.fontSize - 3 }
+                for (var i = 0; i < pill.particles.length; i++) {
+                    var p = pill.particles[i]
+                    var spd = p.isRx ? pill.rxSpeed : pill.txSpeed
+                    var color = p.isRx ? "#4ac4e0" : "#4ae09a"
+
+                    ctx.beginPath()
+                    ctx.arc(p.x, p.y, 1.5, 0, Math.PI * 2)
+                    ctx.fillStyle   = color
+                    ctx.globalAlpha = p.alpha
+                    ctx.shadowColor = color
+                    ctx.shadowBlur  = p.alpha * 5
+                    ctx.fill()
+                }
+                ctx.globalAlpha = 1.0
+            }
         }
     }
 

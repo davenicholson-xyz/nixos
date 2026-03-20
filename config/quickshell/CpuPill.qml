@@ -8,7 +8,7 @@ Rectangle {
     id: pill
     required property var panelRoot
 
-    property real xOff: 24
+    property real xOff: 0
     property int prevTotal: 0
     property int prevIdle: 0
     property int cpuPct: 0
@@ -64,7 +64,7 @@ Rectangle {
         }
     }
 
-    opacity: 0
+    opacity: 1
     transform: Translate { x: pill.xOff }
     color: panelRoot.colPill
     radius: 12

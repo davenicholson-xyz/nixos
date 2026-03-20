@@ -8,16 +8,54 @@ Rectangle {
     id: pill
     required property var panelRoot
 
-    property real xOff: 24
+    property real xOff: 0
     property int ramPct: 0
     property string ramInfo: ""
+    property var blobs: []
 
-    opacity: 0
+    opacity: 1
     transform: Translate { x: pill.xOff }
     color: panelRoot.colPill
     radius: 12
-    width: 76
+    width: 96
     height: ramRow.height + 10
+
+    Component.onCompleted: {
+        var arr = []
+        for (var i = 0; i < 8; i++) {
+            arr.push({
+                x:  4 + Math.random() * 56,
+                y:  2 + Math.random() *  9,
+                vx: (Math.random() - 0.5) * 0.7,
+                vy: (Math.random() - 0.5) * 0.35,
+                r:  2.5 + Math.random() * 1.5
+            })
+        }
+        pill.blobs = arr
+    }
+
+    Timer {
+        interval: 40
+        running: true
+        repeat: true
+        onTriggered: {
+            var W = 64, H = 13
+            var arr = pill.blobs.slice()
+            for (var i = 0; i < arr.length; i++) {
+                var b = { x: arr[i].x, y: arr[i].y,
+                          vx: arr[i].vx, vy: arr[i].vy, r: arr[i].r }
+                b.x += b.vx
+                b.y += b.vy
+                if (b.x - b.r < 0)  { b.x = b.r;     b.vx =  Math.abs(b.vx) }
+                if (b.x + b.r > W)  { b.x = W - b.r; b.vx = -Math.abs(b.vx) }
+                if (b.y - b.r < 0)  { b.y = b.r;     b.vy =  Math.abs(b.vy) }
+                if (b.y + b.r > H)  { b.y = H - b.r; b.vy = -Math.abs(b.vy) }
+                arr[i] = b
+            }
+            pill.blobs = arr
+            lavaCanvas.requestPaint()
+        }
+    }
 
     Row {
         id: ramRow
@@ -47,18 +85,31 @@ Rectangle {
             }
         }
 
-        Rectangle {
-            width: 44
-            height: 3
-            radius: 2
+        Canvas {
+            id: lavaCanvas
+            width: 64
+            height: 13
             anchors.verticalCenter: parent.verticalCenter
-            color: panelRoot.colBarTrack
 
-            Rectangle {
-                width: parent.width * (pill.ramPct / 100)
-                height: parent.height
-                radius: 2
-                color: pill.ramPct >= 95 ? "#e05252" : pill.ramPct >= 80 ? "#e0c94a" : panelRoot.colWsActive
+            onPaint: {
+                var ctx = getContext("2d")
+                ctx.clearRect(0, 0, width, height)
+
+                var count = Math.max(1, Math.round(pill.ramPct / 100 * 8))
+                var color = pill.ramPct >= 95 ? "#e05252"
+                          : pill.ramPct >= 80 ? "#e0c94a"
+                          : "#4ae09a"
+
+                for (var i = 0; i < count; i++) {
+                    var b = pill.blobs[i]
+                    if (!b) continue
+                    ctx.beginPath()
+                    ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2)
+                    ctx.fillStyle = color
+                    ctx.shadowColor = color
+                    ctx.shadowBlur = 6
+                    ctx.fill()
+                }
             }
         }
     }
