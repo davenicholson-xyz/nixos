@@ -17,6 +17,7 @@ Rectangle {
     property string posStr: "0:00"
     property string durStr: "0:00"
     property real _durSecs: 0
+    property string albumName: ""
     property var cavaValues: [0,0,0,0,0,0,0,0,0,0,0,0]
 
     color: panelRoot.colPill
@@ -79,7 +80,7 @@ Rectangle {
                     height: Math.max(1, pill.cavaValues[index] || 0)
                     x: index * 6 + 0.5
                     y: vizContainer.height - height
-                    color: panelRoot.colWsActive
+                    color: Qt.hsla(index / 12, 0.85, 0.65, 1.0)
                     radius: 1
                     opacity: pill.spotifyStatus === "Paused" ? 0.3 : 1
 
@@ -105,7 +106,7 @@ Rectangle {
         command: ["sh", "-c",
             "S=$(playerctl -p spotify status 2>/dev/null) || { echo 'status:Stopped'; exit 0; }; " +
             "echo \"status:$S\"; " +
-            "playerctl -p spotify metadata --format $'art:{{mpris:artUrl}}\\ntitle:{{xesam:title}}\\nartist:{{xesam:artist}}\\nlength:{{mpris:length}}' 2>/dev/null; " +
+            "playerctl -p spotify metadata --format $'art:{{mpris:artUrl}}\\ntitle:{{xesam:title}}\\nartist:{{xesam:artist}}\\nalbum:{{xesam:album}}\\nlength:{{mpris:length}}' 2>/dev/null; " +
             "playerctl -p spotify position 2>/dev/null | awk '{print \"pos:\" $1}'"
         ]
         running: true
@@ -123,6 +124,8 @@ Rectangle {
                     pill.trackName = line.slice(6)
                 } else if (line.startsWith("artist:")) {
                     pill.artistName = line.slice(7)
+                } else if (line.startsWith("album:")) {
+                    pill.albumName = line.slice(6)
                 } else if (line.startsWith("length:")) {
                     pill._durSecs = parseInt(line.slice(7)) / 1000000
                 } else if (line.startsWith("pos:")) {
@@ -170,7 +173,7 @@ Rectangle {
 
     PopupWindow {
         visible: spotifyHover.containsMouse && pill.spotifyRunning
-        implicitWidth: 230
+        implicitWidth: 290
         implicitHeight: spotifyPopupRect.height + 8
         color: "transparent"
         anchor.window: panelRoot
@@ -181,67 +184,129 @@ Rectangle {
         Rectangle {
             id: spotifyPopupRect
             anchors { left: parent.left; right: parent.right; top: parent.top; topMargin: 8 }
-            height: spotifyPopupRow.implicitHeight + 20
+            height: spotifyPopupContent.implicitHeight + 24
             color: panelRoot.colPill
             radius: 10
 
-            Row {
-                id: spotifyPopupRow
-                anchors { left: parent.left; right: parent.right; top: parent.top; margins: 10 }
+            Column {
+                id: spotifyPopupContent
+                anchors { left: parent.left; right: parent.right; top: parent.top; margins: 12 }
                 spacing: 10
 
-                Item {
-                    width: 56; height: 56
-                    anchors.verticalCenter: parent.verticalCenter
+                Row {
+                    width: parent.width
+                    spacing: 12
 
-                    Image {
-                        id: popupArtImg
-                        anchors.fill: parent
-                        source: pill.artUrl
-                        fillMode: Image.PreserveAspectCrop
-                        smooth: true
-                        mipmap: true
-                        visible: false
-                        layer.enabled: true
+                    Item {
+                        width: 72; height: 72
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        Image {
+                            id: popupArtImg
+                            anchors.fill: parent
+                            source: pill.artUrl
+                            fillMode: Image.PreserveAspectCrop
+                            smooth: true
+                            mipmap: true
+                            visible: false
+                            layer.enabled: true
+                        }
+                        Rectangle {
+                            id: popupArtMask
+                            anchors.fill: parent
+                            radius: 8
+                            visible: false
+                            layer.enabled: true
+                        }
+                        OpacityMask {
+                            anchors.fill: parent
+                            source: popupArtImg
+                            maskSource: popupArtMask
+                        }
                     }
-                    Rectangle {
-                        id: popupArtMask
-                        anchors.fill: parent
-                        radius: 6
-                        visible: false
-                        layer.enabled: true
-                    }
-                    OpacityMask {
-                        anchors.fill: parent
-                        source: popupArtImg
-                        maskSource: popupArtMask
+
+                    Column {
+                        spacing: 3
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: parent.width - 72 - parent.spacing
+
+                        Text {
+                            text: pill.trackName
+                            color: panelRoot.colWsActive
+                            font { family: panelRoot.fontFamily; pixelSize: panelRoot.fontSize; bold: true }
+                            elide: Text.ElideRight
+                            width: parent.width
+                        }
+                        Text {
+                            text: pill.artistName
+                            color: panelRoot.colWsOccupied
+                            font { family: panelRoot.fontFamily; pixelSize: panelRoot.fontSize - 2 }
+                            elide: Text.ElideRight
+                            width: parent.width
+                        }
+                        Text {
+                            text: pill.albumName
+                            color: panelRoot.colWsEmpty
+                            font { family: panelRoot.fontFamily; pixelSize: panelRoot.fontSize - 2 }
+                            elide: Text.ElideRight
+                            width: parent.width
+                        }
+
+                        Item { width: 1; height: 3 }
+
+                        Rectangle {
+                            width: statusLabel.width + 10
+                            height: statusLabel.height + 5
+                            radius: 4
+                            color: pill.spotifyStatus === "Playing" ? "#1db954" : "#444444"
+                            Behavior on color { ColorAnimation { duration: 200 } }
+
+                            Text {
+                                id: statusLabel
+                                anchors.centerIn: parent
+                                text: pill.spotifyStatus === "Playing" ? "▶  Playing" : "⏸  Paused"
+                                color: "#ffffff"
+                                font { family: panelRoot.fontFamily; pixelSize: panelRoot.fontSize - 3 }
+                            }
+                        }
                     }
                 }
 
                 Column {
-                    id: spotifyPopupCol
+                    width: parent.width
                     spacing: 4
-                    anchors.verticalCenter: parent.verticalCenter
-                    width: parent.width - 56 - parent.spacing
 
-                    Text {
-                        text: pill.trackName
-                        color: panelRoot.colWsActive
-                        font { family: panelRoot.fontFamily; pixelSize: panelRoot.fontSize - 2 }
-                        elide: Text.ElideRight
+                    Rectangle {
                         width: parent.width
+                        height: 3
+                        radius: 2
+                        color: panelRoot.colBarTrack
+
+                        Rectangle {
+                            width: parent.width * pill.trackProgress
+                            height: parent.height
+                            radius: 2
+                            color: "#1db954"
+                            Behavior on width { NumberAnimation { duration: 500; easing.type: Easing.Linear } }
+                        }
                     }
-                    Text {
-                        text: pill.artistName
-                        color: panelRoot.colWsOccupied
-                        font { family: panelRoot.fontFamily; pixelSize: panelRoot.fontSize - 2 }
-                        elide: Text.ElideRight
+
+                    Item {
                         width: parent.width
-                    }
-                    Text {
-                        text: pill.posStr + " / " + pill.durStr
-                        color: panelRoot.colWsEmpty
-                        font { family: panelRoot.fontFamily; pixelSize: panelRoot.fontSize - 2 }
+                        height: posLabel.height
+
+                        Text {
+                            id: posLabel
+                            text: pill.posStr
+                            color: panelRoot.colWsEmpty
+                            font { family: panelRoot.fontFamily; pixelSize: panelRoot.fontSize - 3 }
+                        }
+                        Text {
+                            anchors.right: parent.right
+                            text: pill.durStr
+                            color: panelRoot.colWsEmpty
+                            font { family: panelRoot.fontFamily; pixelSize: panelRoot.fontSize - 3 }
+                        }
                     }
                 }
             }
