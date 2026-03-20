@@ -224,14 +224,6 @@ PanelWindow {
             }
         }
 
-        ClaudePill {
-            id: claudePill
-            panelRoot: root
-            anchors.right: workspacePill.left
-            anchors.rightMargin: 8
-            anchors.verticalCenter: parent.verticalCenter
-        }
-
         Row {
             anchors.left: parent.left
             anchors.verticalCenter: parent.verticalCenter
