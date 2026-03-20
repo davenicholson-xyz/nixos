@@ -61,6 +61,7 @@ Rectangle {
             if (arr.length > pill.ecgMaxSamples) arr.shift()
             pill.ecgSamples = arr
             ecgCanvas.requestPaint()
+            coreGrid.requestPaint()
         }
     }
 
@@ -68,7 +69,7 @@ Rectangle {
     transform: Translate { x: pill.xOff }
     color: panelRoot.colPill
     radius: 12
-    width: 96
+    width: 116
     height: cpuRow.height + 10
 
     Row {
@@ -76,26 +77,41 @@ Rectangle {
         anchors.centerIn: parent
         spacing: 6
 
-        Item {
+        Canvas {
+            id: coreGrid
             width: 13; height: 13
             anchors.verticalCenter: parent.verticalCenter
 
-            Image {
-                id: cpuIcon
-                anchors.fill: parent
-                source: "icons/cpu.svg"
-                smooth: true
-                mipmap: true
-                sourceSize.width: 13
-                sourceSize.height: 13
-                visible: false
-                layer.enabled: true
-            }
+            onPaint: {
+                var ctx = getContext("2d")
+                ctx.clearRect(0, 0, width, height)
 
-            ColorOverlay {
-                anchors.fill: cpuIcon
-                source: cpuIcon
-                color: panelRoot.colClock
+                // 3 cols × 2 rows
+                var cols = 3, rows = 2
+                var xs = [2, 6, 10]
+                var ys = [3, 9]
+                var r  = 1.8
+
+                for (var row = 0; row < rows; row++) {
+                    for (var col = 0; col < cols; col++) {
+                        var idx = row * cols + col
+                        var pct = pill.corePcts[idx] || 0
+                        var color = pct >= 95 ? "#e05252"
+                                  : pct >= 80 ? "#e0c94a"
+                                  : "#4ae09a"
+                        var alpha = 0.15 + (pct / 100) * 0.85
+
+                        ctx.beginPath()
+                        ctx.arc(xs[col], ys[row], r, 0, Math.PI * 2)
+                        ctx.fillStyle   = color
+                        ctx.globalAlpha = alpha
+                        ctx.shadowColor = color
+                        ctx.shadowBlur  = pct > 50 ? 4 : 1
+                        ctx.fill()
+                    }
+                }
+                ctx.globalAlpha = 1.0
+                ctx.shadowBlur  = 0
             }
         }
 
@@ -139,6 +155,44 @@ Rectangle {
                 grad.addColorStop(1, Qt.rgba(0, 0, 0, 0))
                 ctx.fillStyle = grad
                 ctx.fillRect(0, 0, width * 0.25, height)
+            }
+        }
+
+        Item {
+            width: 13; height: 13
+            anchors.verticalCenter: parent.verticalCenter
+
+            Image {
+                id: thermMask
+                anchors.fill: parent
+                source: "icons/thermometer.svg"
+                smooth: true; mipmap: true
+                sourceSize.width: 13; sourceSize.height: 13
+                visible: false
+                layer.enabled: true
+            }
+
+            ColorOverlay {
+                anchors.fill: thermMask
+                source: thermMask
+                color: panelRoot.colWsEmpty
+            }
+
+            Item {
+                anchors.fill: parent
+                layer.enabled: true
+                layer.effect: OpacityMask { maskSource: thermMask }
+
+                Rectangle {
+                    anchors.bottom: parent.bottom
+                    anchors.left:   parent.left
+                    anchors.right:  parent.right
+                    // 30°C = empty, 100°C = full
+                    height: parent.height * Math.max(0, Math.min(1, (pill.tempC - 30) / 70))
+                    color:  pill.tempC >= 90 ? "#e05252"
+                          : pill.tempC >= 75 ? "#e0c94a"
+                          : "#4aa6e0"
+                }
             }
         }
     }

@@ -11,7 +11,14 @@ Rectangle {
     property real xOff: 0
     property int drivePct: 0
     property string driveInfo: ""
-    property real breathPhase: 0.0
+    property real readSweep:  0.0
+    property real writeSweep: 0.0
+    property real readSpeed:  0
+    property real writeSpeed: 0
+    property real prevRead:   0
+    property real prevWrite:  0
+    property bool firstIO:    true
+    property real maxIO:      500000   // sectors/sec (~250MB/s)
 
     opacity: 1
     transform: Translate { x: pill.xOff }
@@ -25,10 +32,35 @@ Rectangle {
         running: true
         repeat: true
         onTriggered: {
-            pill.breathPhase = (pill.breathPhase + 0.04) % (Math.PI * 2)
+            var base  = 0.03
+            var rBoost = Math.log1p(pill.readSpeed)  / Math.log1p(pill.maxIO) * 0.22
+            var wBoost = Math.log1p(pill.writeSpeed) / Math.log1p(pill.maxIO) * 0.22
+            pill.readSweep  = (pill.readSweep  + base + rBoost + Math.PI * 2) % (Math.PI * 2)
+            pill.writeSweep = (pill.writeSweep - base - wBoost + Math.PI * 2) % (Math.PI * 2)
             ringCanvas.requestPaint()
         }
     }
+
+    Process {
+        id: diskIOProc
+        command: ["sh", "-c", "awk '$3~/^(sd[a-z]$|nvme[0-9]n[0-9]$|vd[a-z]$)/{r+=$6; w+=$10} END{print r+0, w+0}' /proc/diskstats"]
+        running: true
+        stdout: SplitParser {
+            onRead: data => {
+                var p = data.trim().split(" ")
+                if (p.length < 2) return
+                var r = parseFloat(p[0]), w = parseFloat(p[1])
+                if (!pill.firstIO) {
+                    pill.readSpeed  = Math.max(0, r - pill.prevRead)
+                    pill.writeSpeed = Math.max(0, w - pill.prevWrite)
+                }
+                pill.firstIO   = false
+                pill.prevRead  = r
+                pill.prevWrite = w
+            }
+        }
+    }
+    Timer { interval: 1000; running: true; repeat: true; onTriggered: diskIOProc.running = true }
 
     Row {
         id: driveRow
@@ -39,22 +71,41 @@ Rectangle {
             width: 13; height: 13
             anchors.verticalCenter: parent.verticalCenter
 
+            // Mask image — rendered offscreen, used by both layers
             Image {
-                id: driveIcon
+                id: driveIconMask
                 anchors.fill: parent
                 source: "icons/drive.svg"
-                smooth: true
-                mipmap: true
-                sourceSize.width: 13
-                sourceSize.height: 13
+                smooth: true; mipmap: true
+                sourceSize.width: 13; sourceSize.height: 13
                 visible: false
                 layer.enabled: true
             }
 
+            // Dim base — full icon, always visible
             ColorOverlay {
-                anchors.fill: driveIcon
-                source: driveIcon
-                color: panelRoot.colClock
+                anchors.fill: driveIconMask
+                source: driveIconMask
+                color: panelRoot.colWsEmpty
+            }
+
+            // Coloured fill rising from the bottom, clipped to icon shape
+            Item {
+                anchors.fill: parent
+                layer.enabled: true
+                layer.effect: OpacityMask {
+                    maskSource: driveIconMask
+                }
+
+                Rectangle {
+                    anchors.bottom: parent.bottom
+                    anchors.left:   parent.left
+                    anchors.right:  parent.right
+                    height: parent.height * (pill.drivePct / 100)
+                    color:  pill.drivePct >= 95 ? "#e05252"
+                          : pill.drivePct >= 80 ? "#e0c94a"
+                          : "#4ae09a"
+                }
             }
         }
 
@@ -70,32 +121,51 @@ Rectangle {
 
             var cx = width / 2
             var cy = height / 2
-            var r  = width / 2 - 2
+            var r  = width / 2 - 1.5
 
-            var color = pill.drivePct >= 95 ? "#e05252"
-                      : pill.drivePct >= 80 ? "#e0c94a"
-                      : "#4ae09a"
-
-            var breathe = 0.6 + 0.4 * Math.sin(pill.breathPhase)
-
-            // Track
+            // Dim track
             ctx.beginPath()
             ctx.arc(cx, cy, r, 0, Math.PI * 2)
-            ctx.strokeStyle = Qt.rgba(1, 1, 1, 0.08)
-            ctx.lineWidth = 2
-            ctx.shadowBlur = 0
+            ctx.strokeStyle = Qt.rgba(1, 1, 1, 0.07)
+            ctx.lineWidth   = 1.5
+            ctx.shadowBlur  = 0
             ctx.stroke()
 
-            // Usage arc
-            var start = -Math.PI / 2
-            var end   = start + (pill.drivePct / 100) * Math.PI * 2
-            ctx.beginPath()
-            ctx.arc(cx, cy, r, start, end)
-            ctx.strokeStyle = color
-            ctx.lineWidth = 2
-            ctx.shadowColor = color
-            ctx.shadowBlur = 3 + breathe * 6
-            ctx.stroke()
+            // Always draw clockwise arcs — for the write sweep (moving CCW)
+            // the tail sits at angle+tailLen so it still trails correctly
+            function drawSweep(headAngle, tailAngle, color) {
+                // Faded tail
+                ctx.beginPath()
+                ctx.arc(cx, cy, r, tailAngle, headAngle)
+                ctx.strokeStyle = color
+                ctx.globalAlpha = 0.3
+                ctx.lineWidth   = 1.5
+                ctx.shadowBlur  = 0
+                ctx.stroke()
+                ctx.globalAlpha = 1.0
+
+                // Bright head
+                ctx.beginPath()
+                ctx.arc(cx, cy, r, headAngle - 0.15, headAngle)
+                ctx.strokeStyle = color
+                ctx.lineWidth   = 1.5
+                ctx.shadowColor = color
+                ctx.shadowBlur  = 7
+                ctx.stroke()
+
+                // Tip dot
+                ctx.beginPath()
+                ctx.arc(cx + r * Math.cos(headAngle), cy + r * Math.sin(headAngle), 1.2, 0, Math.PI * 2)
+                ctx.fillStyle  = color
+                ctx.shadowBlur = 9
+                ctx.fill()
+                ctx.shadowBlur = 0
+            }
+
+            // Read: clockwise — tail behind head
+            drawSweep(pill.readSweep, pill.readSweep - 0.55, "#4ac4e0")
+            // Write: counter-clockwise — tail ahead (in CW terms)
+            drawSweep(pill.writeSweep + 0.55, pill.writeSweep, "#e07840")
         }
     }
     }
@@ -148,6 +218,12 @@ Rectangle {
                 }
                 Text {
                     text: pill.driveInfo
+                    color: panelRoot.colWsOccupied
+                    font { family: panelRoot.fontFamily; pixelSize: panelRoot.fontSize - 2 }
+                }
+                Text {
+                    text: "↓ " + Math.round(pill.readSpeed  * 512 / 1024) + " KB/s  "
+                        + "↑ " + Math.round(pill.writeSpeed * 512 / 1024) + " KB/s"
                     color: panelRoot.colWsOccupied
                     font { family: panelRoot.fontFamily; pixelSize: panelRoot.fontSize - 2 }
                 }

@@ -40,21 +40,37 @@ Rectangle {
             anchors.verticalCenter: parent.verticalCenter
 
             Image {
-                id: ramIcon
+                id: ramIconMask
                 anchors.fill: parent
                 source: "icons/ram.svg"
-                smooth: true
-                mipmap: true
-                sourceSize.width: 13
-                sourceSize.height: 13
+                smooth: true; mipmap: true
+                sourceSize.width: 13; sourceSize.height: 13
                 visible: false
                 layer.enabled: true
             }
 
+            // Dim base
             ColorOverlay {
-                anchors.fill: ramIcon
-                source: ramIcon
-                color: panelRoot.colClock
+                anchors.fill: ramIconMask
+                source: ramIconMask
+                color: panelRoot.colWsEmpty
+            }
+
+            // Coloured fill rising from bottom
+            Item {
+                anchors.fill: parent
+                layer.enabled: true
+                layer.effect: OpacityMask { maskSource: ramIconMask }
+
+                Rectangle {
+                    anchors.bottom: parent.bottom
+                    anchors.left:   parent.left
+                    anchors.right:  parent.right
+                    height: parent.height * (pill.ramPct / 100)
+                    color:  pill.ramPct >= 95 ? "#e05252"
+                          : pill.ramPct >= 80 ? "#e0c94a"
+                          : "#4aa6e0"
+                }
             }
         }
 
