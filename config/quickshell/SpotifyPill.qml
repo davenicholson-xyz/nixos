@@ -17,6 +17,7 @@ Rectangle {
     property string posStr: "0:00"
     property string durStr: "0:00"
     property real _durSecs: 0
+    property var cavaValues: [0,0,0,0,0,0,0,0,0,0,0,0]
 
     color: panelRoot.colPill
     radius: 12
@@ -36,7 +37,7 @@ Rectangle {
     Row {
         id: spotifyRow
         anchors.centerIn: parent
-        spacing: 6
+        spacing: 12
 
         Item {
             width: 13; height: 13
@@ -74,29 +75,19 @@ Rectangle {
             Repeater {
                 model: 12
                 delegate: Rectangle {
-                    id: vizBar
-                    width: 4; height: 2
+                    width: 4
+                    height: Math.max(1, pill.cavaValues[index] || 0)
                     x: index * 6 + 0.5
                     y: vizContainer.height - height
                     color: panelRoot.colWsActive
                     radius: 1
                     opacity: pill.spotifyStatus === "Paused" ? 0.3 : 1
 
-                    Behavior on height { NumberAnimation { duration: 180; easing.type: Easing.InOutSine } }
+                    Behavior on height { NumberAnimation { duration: 50; easing.type: Easing.OutCubic } }
                     Behavior on opacity { NumberAnimation { duration: 200 } }
-
-                    Timer {
-                        interval: 120 + index * 23
-                        running: pill.spotifyStatus === "Playing"
-                        repeat: true
-                        onTriggered: vizBar.height = 1 + Math.random() * 9
-                        onRunningChanged: if (!running) vizBar.height = 2
-                    }
                 }
             }
         }
-
-        Item { width: 4; height: 1 }
 
         Text {
             textFormat: Text.RichText
@@ -161,6 +152,20 @@ Rectangle {
         running: true
         repeat: true
         onTriggered: spotifyProc.running = true
+    }
+
+    Process {
+        id: cavaProc
+        command: ["bash", "-c", "exec cava -p $HOME/.config/quickshell/cava.cfg"]
+        running: pill.spotifyStatus === "Playing"
+        stdout: SplitParser {
+            onRead: data => {
+                var parts = data.trim().replace(/;$/, "").split(";")
+                if (parts.length >= 12)
+                    pill.cavaValues = parts.slice(0, 12).map(s => parseInt(s) || 0)
+            }
+        }
+        onRunningChanged: if (!running) pill.cavaValues = [0,0,0,0,0,0,0,0,0,0,0,0]
     }
 
     PopupWindow {

@@ -56,6 +56,8 @@ in
       btop
 
 
+      cava
+
       nerd-fonts.jetbrains-mono
       nerd-fonts.sauce-code-pro
   ];
