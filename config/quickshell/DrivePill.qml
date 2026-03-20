@@ -17,8 +17,8 @@ Rectangle {
     transform: Translate { x: pill.xOff }
     color: panelRoot.colPill
     radius: 12
-    width: 32
-    height: ringCanvas.height + 10
+    width: 48
+    height: driveRow.height + 10
 
     Timer {
         interval: 50
@@ -30,11 +30,39 @@ Rectangle {
         }
     }
 
-    Canvas {
-        id: ringCanvas
+    Row {
+        id: driveRow
         anchors.centerIn: parent
-        width: 13
-        height: 13
+        spacing: 5
+
+        Item {
+            width: 13; height: 13
+            anchors.verticalCenter: parent.verticalCenter
+
+            Image {
+                id: driveIcon
+                anchors.fill: parent
+                source: "icons/drive.svg"
+                smooth: true
+                mipmap: true
+                sourceSize.width: 13
+                sourceSize.height: 13
+                visible: false
+                layer.enabled: true
+            }
+
+            ColorOverlay {
+                anchors.fill: driveIcon
+                source: driveIcon
+                color: panelRoot.colClock
+            }
+        }
+
+        Canvas {
+            id: ringCanvas
+            anchors.verticalCenter: parent.verticalCenter
+            width: 13
+            height: 13
 
         onPaint: {
             var ctx = getContext("2d")
@@ -69,6 +97,7 @@ Rectangle {
             ctx.shadowBlur = 3 + breathe * 6
             ctx.stroke()
         }
+    }
     }
 
     Process {

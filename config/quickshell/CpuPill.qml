@@ -112,7 +112,7 @@ Rectangle {
                 var s = pill.ecgSamples
                 if (s.length < 2) return
 
-                var midY = height / 2
+                var midY = height * 0.65
                 var amp  = height * 0.44
 
                 var lineColor = pill.cpuPct >= 95 ? "#e05252"
