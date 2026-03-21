@@ -28,13 +28,13 @@ Rectangle {
     height: driveRow.height + 10
 
     Timer {
-        interval: 50
-        running: true
+        interval: 100
+        running: panelRoot.pillsVisible
         repeat: true
         onTriggered: {
-            var base  = 0.03
-            var rBoost = Math.log1p(pill.readSpeed)  / Math.log1p(pill.maxIO) * 0.22
-            var wBoost = Math.log1p(pill.writeSpeed) / Math.log1p(pill.maxIO) * 0.22
+            var base  = 0.06
+            var rBoost = Math.log1p(pill.readSpeed)  / Math.log1p(pill.maxIO) * 0.44
+            var wBoost = Math.log1p(pill.writeSpeed) / Math.log1p(pill.maxIO) * 0.44
             pill.readSweep  = (pill.readSweep  + base + rBoost + Math.PI * 2) % (Math.PI * 2)
             pill.writeSweep = (pill.writeSweep - base - wBoost + Math.PI * 2) % (Math.PI * 2)
             ringCanvas.requestPaint()
@@ -140,7 +140,6 @@ Rectangle {
                 ctx.strokeStyle = color
                 ctx.globalAlpha = 0.3
                 ctx.lineWidth   = 1.5
-                ctx.shadowBlur  = 0
                 ctx.stroke()
                 ctx.globalAlpha = 1.0
 
@@ -148,18 +147,14 @@ Rectangle {
                 ctx.beginPath()
                 ctx.arc(cx, cy, r, headAngle - 0.15, headAngle)
                 ctx.strokeStyle = color
-                ctx.lineWidth   = 1.5
-                ctx.shadowColor = color
-                ctx.shadowBlur  = 7
+                ctx.lineWidth   = 2.0
                 ctx.stroke()
 
                 // Tip dot
                 ctx.beginPath()
-                ctx.arc(cx + r * Math.cos(headAngle), cy + r * Math.sin(headAngle), 1.2, 0, Math.PI * 2)
+                ctx.arc(cx + r * Math.cos(headAngle), cy + r * Math.sin(headAngle), 1.5, 0, Math.PI * 2)
                 ctx.fillStyle  = color
-                ctx.shadowBlur = 9
                 ctx.fill()
-                ctx.shadowBlur = 0
             }
 
             // Read: clockwise — tail behind head

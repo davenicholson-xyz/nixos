@@ -21,11 +21,11 @@ Rectangle {
     height: ramRow.height + 10
 
     Timer {
-        interval: 40
-        running: true
+        interval: 80
+        running: panelRoot.pillsVisible
         repeat: true
         onTriggered: {
-            pill.sloshPhase += 0.05
+            pill.sloshPhase += 0.10
             lavaCanvas.requestPaint()
         }
     }
@@ -123,8 +123,6 @@ Rectangle {
                 ctx.strokeStyle = color
                 ctx.lineWidth   = 1.5
                 ctx.lineJoin    = "round"
-                ctx.shadowColor = color
-                ctx.shadowBlur  = 4
                 ctx.stroke()
             }
         }

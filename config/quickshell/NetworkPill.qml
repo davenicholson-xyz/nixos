@@ -26,12 +26,12 @@ Rectangle {
     property int historyMax: 80
 
     Timer {
-        interval: 40
-        running: true
+        interval: 80
+        running: panelRoot.pillsVisible
         repeat: true
         onTriggered: {
-            var rx = pill.rxHistory.slice(); rx.push(pill.rxSpeed); if (rx.length > pill.historyMax) rx.shift(); pill.rxHistory = rx
-            var tx = pill.txHistory.slice(); tx.push(pill.txSpeed); if (tx.length > pill.historyMax) tx.shift(); pill.txHistory = tx
+            pill.rxHistory.push(pill.rxSpeed); if (pill.rxHistory.length > pill.historyMax) pill.rxHistory.shift()
+            pill.txHistory.push(pill.txSpeed); if (pill.txHistory.length > pill.historyMax) pill.txHistory.shift()
             netCanvas.requestPaint()
         }
     }
@@ -121,8 +121,6 @@ Rectangle {
 
                 function drawSparkline(history, baseY, up, color) {
                     if (history.length < 2) return
-                    var curSpd = history[history.length - 1]
-                    var glow   = norm(curSpd) / (half - 1)
 
                     // Filled area under the line
                     ctx.beginPath()
@@ -156,10 +154,7 @@ Rectangle {
                     ctx.strokeStyle = color
                     ctx.lineWidth   = 1.2
                     ctx.lineJoin    = "round"
-                    ctx.shadowColor = color
-                    ctx.shadowBlur  = 1 + glow * 5
                     ctx.stroke()
-                    ctx.shadowBlur  = 0
                 }
 
                 // Faint centre divider

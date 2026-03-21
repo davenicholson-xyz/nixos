@@ -50,16 +50,15 @@ Rectangle {
     }
 
     Timer {
-        interval: 40
-        running: true
+        interval: 80
+        running: panelRoot.pillsVisible
         repeat: true
         onTriggered: {
             var bpm = 50 + (pill.cpuPct / 100) * 110
-            pill.beatPhase = (pill.beatPhase + (bpm / 60) * 0.04) % 1.0
-            var arr = pill.ecgSamples.slice()
-            arr.push(pill.ecgSample(pill.beatPhase))
-            if (arr.length > pill.ecgMaxSamples) arr.shift()
-            pill.ecgSamples = arr
+            pill.beatPhase = (pill.beatPhase + (bpm / 60) * 0.08) % 1.0
+            pill.ecgSamples.push(pill.ecgSample(pill.beatPhase))
+            if (pill.ecgSamples.length > pill.ecgMaxSamples) pill.ecgSamples.shift()
+            pill.ecgSamples = pill.ecgSamples
             ecgCanvas.requestPaint()
             coreGrid.requestPaint()
         }
@@ -105,13 +104,10 @@ Rectangle {
                         ctx.arc(xs[col], ys[row], r, 0, Math.PI * 2)
                         ctx.fillStyle   = color
                         ctx.globalAlpha = alpha
-                        ctx.shadowColor = color
-                        ctx.shadowBlur  = pct > 50 ? 4 : 1
                         ctx.fill()
                     }
                 }
                 ctx.globalAlpha = 1.0
-                ctx.shadowBlur  = 0
             }
         }
 
@@ -138,8 +134,6 @@ Rectangle {
                 ctx.strokeStyle = lineColor
                 ctx.lineWidth = 1.5
                 ctx.lineJoin = "round"
-                ctx.shadowColor = lineColor
-                ctx.shadowBlur = 5
 
                 ctx.beginPath()
                 for (var i = 0; i < s.length; i++) {
