@@ -54,8 +54,6 @@ in
       trash-cli
       nh
       btop
-
-
       cava
 
       nerd-fonts.jetbrains-mono
@@ -65,6 +63,11 @@ in
   programs.fzf = {
     enable = true;
     enableZshIntegration = true;
+  };
+
+  programs.zoxide = {
+      enable = true;
+      enableZshIntegration = true;
   };
 
   programs.zsh = {
@@ -111,6 +114,7 @@ function _tmux_rename_session() {
   [[ -n "$TMUX" ]] && tmux rename-session "$(basename "$PWD")" 2>/dev/null
 }
 add-zsh-hook chpwd _tmux_rename_session
+_tmux_rename_session
       '';
 
   };
