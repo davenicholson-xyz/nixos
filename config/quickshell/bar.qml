@@ -239,8 +239,8 @@ PanelWindow {
             anchors.verticalCenter: parent.verticalCenter
             spacing: 8
 
-            SpotifyPill {
-                id: spotifyPill
+            MediaPill {
+                id: mediaPill
                 panelRoot: root
                 anchors.verticalCenter: parent.verticalCenter
             }

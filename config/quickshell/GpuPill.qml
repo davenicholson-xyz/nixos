@@ -38,7 +38,6 @@ Rectangle {
             var speed = 0.04 + (pill.gpuFreqMhz / Math.max(1, pill.gpuMaxFreqMhz)) * 0.22
             pill.wavePhase += speed
             waveCanvas.requestPaint()
-            chipCanvas.requestPaint()
         }
     }
 
@@ -47,39 +46,23 @@ Rectangle {
         anchors.centerIn: parent
         spacing: 6
 
-        // IC chip icon: box + pins, filled from bottom by GPU%
-        Canvas {
-            id: chipCanvas
+        Item {
             width: 13; height: 13
             anchors.verticalCenter: parent.verticalCenter
 
-            onPaint: {
-                var ctx = getContext("2d")
-                ctx.clearRect(0, 0, width, height)
-
-                var pct   = pill.gpuPct / 100
-                var color = pill.gpuColor()
-
-                // Body outline
-                ctx.strokeStyle = Qt.rgba(1, 1, 1, 0.20)
-                ctx.lineWidth   = 1
-                ctx.strokeRect(2.5, 2.5, 8, 8)
-
-                // Fill rising from bottom
-                var fillH = 8 * pct
-                ctx.fillStyle   = color
-                ctx.globalAlpha = 0.15 + pct * 0.75
-                ctx.fillRect(3, 2.5 + 8 - fillH, 7.5, fillH)
-                ctx.globalAlpha = 1.0
-
-                // Pins: 2 per side
-                ctx.strokeStyle = Qt.rgba(1, 1, 1, 0.18)
-                ctx.lineWidth   = 0.8
-                var pinYs = [5, 8]
-                for (var i = 0; i < pinYs.length; i++) {
-                    ctx.beginPath(); ctx.moveTo(0, pinYs[i]); ctx.lineTo(2.5, pinYs[i]); ctx.stroke()
-                    ctx.beginPath(); ctx.moveTo(10.5, pinYs[i]); ctx.lineTo(13, pinYs[i]); ctx.stroke()
-                }
+            Image {
+                id: gpuIcon
+                anchors.fill: parent
+                source: Qt.resolvedUrl("icons/gpu.svg")
+                smooth: true; mipmap: true
+                sourceSize.width: 13; sourceSize.height: 13
+                visible: false
+                layer.enabled: true
+            }
+            ColorOverlay {
+                anchors.fill: gpuIcon
+                source: gpuIcon
+                color: pill.gpuColor()
             }
         }
 

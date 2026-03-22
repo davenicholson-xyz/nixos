@@ -11,7 +11,7 @@
   boot.loader.systemd-boot.configurationLimit = 10;
 
   boot.kernelPackages = pkgs.linuxPackages_latest;
-  boot.kernelParams = [ "usbcore.autosuspend=-1" ];
+  boot.kernelParams = [ "usbcore.autosuspend=-1" "i915.enable_guc=3" ];
 
   services.upower.enable = false; # if you don't need it
   powerManagement.enable = false;
@@ -43,10 +43,11 @@
   hardware.graphics = {
     enable = true;
     extraPackages = with pkgs; [
-      intel-media-driver  # iHD, for 8th gen+
+        intel-media-driver  # iHD, for 8th gen+
         intel-vaapi-driver
         libva-vdpau-driver
         libvdpau-va-gl
+        intel-compute-runtime
     ];
   };
 
