@@ -96,7 +96,7 @@ in
 
 
     initContent = ''
-autoload -Uz vcs_info
+autoload -Uz vcs_info add-zsh-hook
 precmd() { vcs_info }
 zstyle ':vcs_info:git:*' formats ' (%b%u%c)'
 zstyle ':vcs_info:git:*' actionformats ' (%b|%a%u%c)'
@@ -105,6 +105,12 @@ zstyle ':vcs_info:git:*' unstagedstr '!'
 zstyle ':vcs_info:git:*' stagedstr '+'
 setopt PROMPT_SUBST
 PROMPT='%F{cyan}%~%f%F{yellow}''${vcs_info_msg_0_}%f %(?.%F{green}❯%f.%F{red}❯%f) '
+
+# Auto-rename tmux session to current directory basename on cd
+function _tmux_rename_session() {
+  [[ -n "$TMUX" ]] && tmux rename-session "$(basename "$PWD")" 2>/dev/null
+}
+add-zsh-hook chpwd _tmux_rename_session
       '';
 
   };

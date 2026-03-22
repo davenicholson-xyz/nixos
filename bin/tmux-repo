@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Usage: tmux-repo <directory>
+# Opens kitty and attaches to an existing tmux session or creates a new one.
+# The session name is derived from the directory's basename.
+
+DIR="$1"
+SESSION="$(basename "$DIR")"
+
+if tmux has-session -t "$SESSION" 2>/dev/null; then
+    kitty sh -c "tmux attach-session -t '$SESSION'" &
+else
+    kitty sh -c "cd '$DIR' && tmux new-session -s '$SESSION'" &
+fi

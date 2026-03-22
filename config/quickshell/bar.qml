@@ -78,8 +78,21 @@ PanelWindow {
         onPressed: powerMenu.menuOpen ? powerMenu.close() : powerMenu.open()
     }
 
+    GlobalShortcut {
+        appid: "quickshell"
+        name: "toggleRepoMenu"
+        description: "Toggle repo session menu"
+        onPressed: repoMenu.menuOpen ? repoMenu.close() : repoMenu.open()
+    }
+
     PowerMenu {
         id: powerMenu
+        panelRoot: root
+        anchorItem: workspacePill
+    }
+
+    RepoMenu {
+        id: repoMenu
         panelRoot: root
         anchorItem: workspacePill
     }
@@ -145,7 +158,7 @@ PanelWindow {
     anchors.right: true
     implicitHeight: 30
     color: root.colBg
-    WlrLayershell.keyboardFocus: (launcherPill.launcherOpen || powerMenu.menuOpen) ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+    WlrLayershell.keyboardFocus: (launcherPill.launcherOpen || powerMenu.menuOpen || repoMenu.menuOpen) ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
     Item {
         anchors.fill: parent
