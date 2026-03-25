@@ -144,7 +144,7 @@ _tmux_rename_session
       username = "fatnic";
       apiKey = apiKey;
       categories = "101";
-      purity = "111";
+      purity = "110";
       script = "/home/dave/nixos/bin/setwallpaper";
       minResolution = "2560x1440";
     };
