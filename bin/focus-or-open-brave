@@ -1,6 +1,17 @@
 #!/usr/bin/env bash
-if hyprctl clients -j | grep -q '"class": "brave-browser"'; then
-    hyprctl dispatch focuswindow class:brave-browser
+
+if [ -n "$NIRI_SOCKET" ]; then
+    brave_id=$(niri msg -j windows | jq -r '.[] | select(.app_id == "brave-browser") | .id' | head -1)
+    if [ -n "$brave_id" ]; then
+        niri msg action focus-window --id "$brave_id"
+    else
+        niri msg action focus-workspace web
+        brave &
+    fi
 else
-    brave
+    if hyprctl clients -j | grep -q '"class": "brave-browser"'; then
+        hyprctl dispatch focuswindow class:brave-browser
+    else
+        brave
+    fi
 fi

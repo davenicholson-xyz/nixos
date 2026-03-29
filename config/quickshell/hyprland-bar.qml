@@ -97,60 +97,16 @@ PanelWindow {
         anchorItem: workspacePill
     }
 
-    SequentialAnimation {
+    ParallelAnimation {
         id: showAnim
-        ParallelAnimation {
-            NumberAnimation { target: networkPill; property: "xOff"; to: 0; duration: 220; easing.type: Easing.OutCubic }
-            NumberAnimation { target: networkPill; property: "opacity"; to: 1; duration: 180; easing.type: Easing.OutCubic }
-        }
-        PauseAnimation { duration: 40 }
-        ParallelAnimation {
-            NumberAnimation { target: drivePill; property: "xOff"; to: 0; duration: 220; easing.type: Easing.OutCubic }
-            NumberAnimation { target: drivePill; property: "opacity"; to: 1; duration: 180; easing.type: Easing.OutCubic }
-        }
-        PauseAnimation { duration: 40 }
-        ParallelAnimation {
-            NumberAnimation { target: ramPill; property: "xOff"; to: 0; duration: 220; easing.type: Easing.OutCubic }
-            NumberAnimation { target: ramPill; property: "opacity"; to: 1; duration: 180; easing.type: Easing.OutCubic }
-        }
-        PauseAnimation { duration: 40 }
-        ParallelAnimation {
-            NumberAnimation { target: gpuPill; property: "xOff"; to: 0; duration: 220; easing.type: Easing.OutCubic }
-            NumberAnimation { target: gpuPill; property: "opacity"; to: 1; duration: 180; easing.type: Easing.OutCubic }
-        }
-        PauseAnimation { duration: 40 }
-        ParallelAnimation {
-            NumberAnimation { target: cpuPill; property: "xOff"; to: 0; duration: 220; easing.type: Easing.OutCubic }
-            NumberAnimation { target: cpuPill; property: "opacity"; to: 1; duration: 180; easing.type: Easing.OutCubic }
-        }
+        NumberAnimation { target: infoPill; property: "xOff"; to: 0; duration: 220; easing.type: Easing.OutCubic }
+        NumberAnimation { target: infoPill; property: "opacity"; to: 1; duration: 180; easing.type: Easing.OutCubic }
     }
 
-    SequentialAnimation {
+    ParallelAnimation {
         id: hideAnim
-        ParallelAnimation {
-            NumberAnimation { target: cpuPill; property: "xOff"; to: 24; duration: 160; easing.type: Easing.InCubic }
-            NumberAnimation { target: cpuPill; property: "opacity"; to: 0; duration: 120; easing.type: Easing.InCubic }
-        }
-        PauseAnimation { duration: 30 }
-        ParallelAnimation {
-            NumberAnimation { target: gpuPill; property: "xOff"; to: 24; duration: 160; easing.type: Easing.InCubic }
-            NumberAnimation { target: gpuPill; property: "opacity"; to: 0; duration: 120; easing.type: Easing.InCubic }
-        }
-        PauseAnimation { duration: 30 }
-        ParallelAnimation {
-            NumberAnimation { target: ramPill; property: "xOff"; to: 24; duration: 160; easing.type: Easing.InCubic }
-            NumberAnimation { target: ramPill; property: "opacity"; to: 0; duration: 120; easing.type: Easing.InCubic }
-        }
-        PauseAnimation { duration: 30 }
-        ParallelAnimation {
-            NumberAnimation { target: drivePill; property: "xOff"; to: 24; duration: 160; easing.type: Easing.InCubic }
-            NumberAnimation { target: drivePill; property: "opacity"; to: 0; duration: 120; easing.type: Easing.InCubic }
-        }
-        PauseAnimation { duration: 30 }
-        ParallelAnimation {
-            NumberAnimation { target: networkPill; property: "xOff"; to: 24; duration: 160; easing.type: Easing.InCubic }
-            NumberAnimation { target: networkPill; property: "opacity"; to: 0; duration: 120; easing.type: Easing.InCubic }
-        }
+        NumberAnimation { target: infoPill; property: "xOff"; to: 24; duration: 160; easing.type: Easing.InCubic }
+        NumberAnimation { target: infoPill; property: "opacity"; to: 0; duration: 120; easing.type: Easing.InCubic }
     }
 
     anchors.top: true
@@ -270,15 +226,7 @@ RowLayout {
             anchors.verticalCenter: parent.verticalCenter
             spacing: 8
 
-            Row {
-                spacing: 8
-
-                CpuPill     { id: cpuPill;     panelRoot: root }
-                GpuPill     { id: gpuPill;     panelRoot: root }
-                RamPill     { id: ramPill;     panelRoot: root }
-                DrivePill   { id: drivePill;   panelRoot: root }
-                NetworkPill { id: networkPill; panelRoot: root }
-            }
+            InfoPill { id: infoPill; panelRoot: root }
 
             Item {
                 width: 14; height: 14
