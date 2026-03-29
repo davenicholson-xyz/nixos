@@ -378,6 +378,7 @@ binds {
     // Suggested binds for running programs: terminal, app launcher, screen locker.
     Mod+Return hotkey-overlay-title="Open a Terminal: kitty" { spawn "kitty"; }
     Mod+B { spawn-sh "focus-or-open-brave"; }
+    Mod+Shift+N { spawn-sh "brave --new-window --incognito --user-data-dir='/tmp/brave-vpn' --proxy-server='http://172.16.20.99:8888'"; }
     Mod+W { spawn-sh "govista -R"; }
     Mod+S { spawn "spotify"; }
 
