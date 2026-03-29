@@ -32,6 +32,7 @@ in
   };
 
   home.file.".config/hypr".source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/nixos/config/hypr";
+  home.file.".config/niri".source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/nixos/config/niri";
   home.file.".config/kitty".source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/nixos/config/kitty";
   home.file.".config/quickshell".source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/nixos/config/quickshell";
 
@@ -58,6 +59,10 @@ in
 
       nerd-fonts.jetbrains-mono
       nerd-fonts.sauce-code-pro
+
+
+      niri
+      xwayland
   ];
 
   programs.fzf = {

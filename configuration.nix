@@ -38,6 +38,7 @@
 
   environment.sessionVariables = {
     LIBVA_DRIVER_NAME = "iHD";
+    NIXOS_OZONE_WL = "1"; 
   };
 
   hardware.graphics = {
@@ -58,6 +59,9 @@
     xwayland.enable = true;
     systemd.setPath.enable = true;
   };
+
+  programs.niri.enable = true;
+  programs.ydotool.enable = true;
 
   services.displayManager.autoLogin = {
     enable = true;
@@ -92,7 +96,7 @@
   users.users.dave = {
     isNormalUser = true;
     description = "Dave Nicholson";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" "ydotool" ];
     shell = pkgs.zsh;
     packages = with pkgs; [
       kdePackages.kate
@@ -117,6 +121,7 @@
       quickshell
       qt6.qt5compat
 
+      ydotool
   ];
 
   services.transmission = {
