@@ -18,8 +18,8 @@ Rectangle {
     property real wavePhase:   0.0
 
     function gpuColor() {
-        return gpuPct >= 95 ? "#e05252"
-             : gpuPct >= 80 ? "#e0c94a"
+        return gpuPct >= 95 ? panelRoot.colHigh.toString()
+             : gpuPct >= 80 ? panelRoot.colWarn.toString()
              : "#a07de0"
     }
 
@@ -81,8 +81,8 @@ Rectangle {
                 var phase = pill.wavePhase
                 var cr, cg, cb, color
 
-                if (pill.gpuPct >= 95)      { cr=0.878; cg=0.322; cb=0.322; color="#e05252" }
-                else if (pill.gpuPct >= 80) { cr=0.878; cg=0.788; cb=0.290; color="#e0c94a" }
+                if (pill.gpuPct >= 95)      { cr=panelRoot.colHigh.r; cg=panelRoot.colHigh.g; cb=panelRoot.colHigh.b; color=panelRoot.colHigh.toString() }
+                else if (pill.gpuPct >= 80) { cr=panelRoot.colWarn.r; cg=panelRoot.colWarn.g; cb=panelRoot.colWarn.b; color=panelRoot.colWarn.toString() }
                 else                        { cr=0.627; cg=0.490; cb=0.878; color="#a07de0" }
 
                 var fillHeight = Math.max(2, pct * height)

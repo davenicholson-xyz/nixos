@@ -95,8 +95,8 @@ Rectangle {
                     for (var col = 0; col < cols; col++) {
                         var idx = row * cols + col
                         var pct = pill.corePcts[idx] || 0
-                        var color = pct >= 95 ? "#e05252"
-                                  : pct >= 80 ? "#e0c94a"
+                        var color = pct >= 95 ? panelRoot.colHigh.toString()
+                                  : pct >= 80 ? panelRoot.colWarn.toString()
                                   : "#4ae09a"
                         var alpha = 0.15 + (pct / 100) * 0.85
 
@@ -127,8 +127,8 @@ Rectangle {
                 var midY = height * 0.65
                 var amp  = height * 0.44
 
-                var lineColor = pill.cpuPct >= 95 ? "#e05252"
-                              : pill.cpuPct >= 80 ? "#e0c94a"
+                var lineColor = pill.cpuPct >= 95 ? panelRoot.colHigh.toString()
+                              : pill.cpuPct >= 80 ? panelRoot.colWarn.toString()
                               : "#4ae09a"
 
                 ctx.strokeStyle = lineColor
@@ -183,8 +183,8 @@ Rectangle {
                     anchors.right:  parent.right
                     // 30°C = empty, 100°C = full
                     height: parent.height * Math.max(0, Math.min(1, (pill.tempC - 30) / 70))
-                    color:  pill.tempC >= 90 ? "#e05252"
-                          : pill.tempC >= 75 ? "#e0c94a"
+                    color:  pill.tempC >= 90 ? panelRoot.colHigh
+                          : pill.tempC >= 75 ? panelRoot.colWarn
                           : "#4aa6e0"
                 }
             }
@@ -301,7 +301,7 @@ Rectangle {
                 }
                 Text {
                     text: "Temp  " + pill.tempC + "°C"
-                    color: pill.tempC >= 90 ? "#e05252" : pill.tempC >= 75 ? "#e0c94a" : panelRoot.colWsActive
+                    color: pill.tempC >= 90 ? panelRoot.colHigh : pill.tempC >= 75 ? panelRoot.colWarn : panelRoot.colWsActive
                     font { family: panelRoot.fontFamily; pixelSize: panelRoot.fontSize - 2 }
                 }
                 Rectangle {
@@ -331,7 +331,7 @@ Rectangle {
                                 width: parent.width * (modelData / 100)
                                 height: parent.height
                                 radius: 2
-                                color: modelData >= 95 ? "#e05252" : modelData >= 80 ? "#e0c94a" : panelRoot.colWsActive
+                                color: modelData >= 95 ? panelRoot.colHigh : modelData >= 80 ? panelRoot.colWarn : panelRoot.colWsActive
                             }
                         }
                         Text {

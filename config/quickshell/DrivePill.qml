@@ -102,8 +102,8 @@ Rectangle {
                     anchors.left:   parent.left
                     anchors.right:  parent.right
                     height: parent.height * (pill.drivePct / 100)
-                    color:  pill.drivePct >= 95 ? "#e05252"
-                          : pill.drivePct >= 80 ? "#e0c94a"
+                    color:  pill.drivePct >= 95 ? panelRoot.colHigh
+                          : pill.drivePct >= 80 ? panelRoot.colWarn
                           : "#4ae09a"
                 }
             }

@@ -16,6 +16,8 @@ PanelWindow {
     property color colWsEmpty: "#555555"
     property color colClock: "#ffffff"
     property color colBarTrack: root.colWsEmpty
+    property color colHigh: "#e05252"
+    property color colWarn: "#e0c94a"
     property string fontFamily: "SauceCodePro Nerd Font"
     property int fontSize: 13
     property var wsIcons: ["icons/terminal.svg", "icons/browser.svg", "icons/video.svg", "icons/music.svg"]

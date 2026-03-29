@@ -67,8 +67,8 @@ Rectangle {
                     anchors.left:   parent.left
                     anchors.right:  parent.right
                     height: parent.height * (pill.ramPct / 100)
-                    color:  pill.ramPct >= 95 ? "#e05252"
-                          : pill.ramPct >= 80 ? "#e0c94a"
+                    color:  pill.ramPct >= 95 ? panelRoot.colHigh
+                          : pill.ramPct >= 80 ? panelRoot.colWarn
                           : "#4aa6e0"
                 }
             }
@@ -85,8 +85,8 @@ Rectangle {
                 ctx.clearRect(0, 0, width, height)
 
                 var cr, cg, cb, color
-                if (pill.ramPct >= 95)      { cr=0.878; cg=0.322; cb=0.322; color="#e05252" }
-                else if (pill.ramPct >= 80) { cr=0.878; cg=0.788; cb=0.290; color="#e0c94a" }
+                if (pill.ramPct >= 95)      { cr=panelRoot.colHigh.r; cg=panelRoot.colHigh.g; cb=panelRoot.colHigh.b; color=panelRoot.colHigh.toString() }
+                else if (pill.ramPct >= 80) { cr=panelRoot.colWarn.r; cg=panelRoot.colWarn.g; cb=panelRoot.colWarn.b; color=panelRoot.colWarn.toString() }
                 else                        { cr=0.290; cg=0.647; cb=0.878; color="#4aa6e0" }
 
                 var phase      = pill.sloshPhase

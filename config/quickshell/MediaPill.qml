@@ -298,7 +298,7 @@ Rectangle {
                             width: parent.width * pill.trackProgress
                             height: parent.height
                             radius: 2
-                            color: "#7eb8f7"
+                            color: pill.playerName === "spotify" ? "#1db954" : "#7eb8f7"
                             Behavior on width { NumberAnimation { duration: 500; easing.type: Easing.Linear } }
                         }
                     }

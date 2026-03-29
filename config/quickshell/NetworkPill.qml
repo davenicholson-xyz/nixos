@@ -72,26 +72,32 @@ Rectangle {
         anchors.centerIn: parent
         spacing: 5
 
-        Item {
-            width: 13; height: 13
+        Column {
             anchors.verticalCenter: parent.verticalCenter
+            spacing: 0
 
-            Image {
-                id: netIcon
-                anchors.fill: parent
-                source: "icons/network.svg"
-                smooth: true
-                mipmap: true
-                sourceSize.width: 13
-                sourceSize.height: 13
-                visible: false
-                layer.enabled: true
+            Text {
+                text: "↑"
+                font { family: panelRoot.fontFamily; pixelSize: 7 }
+                color: {
+                    var pct = pill.txSpeed / pill.maxSpeed * 100
+                    if (pct >= 80) return panelRoot.colHigh
+                    if (pct >= 40) return panelRoot.colWarn
+                    if (pill.txSpeed >= 1024) return "#e07840"
+                    return Qt.rgba(1, 1, 1, 0.25)
+                }
             }
 
-            ColorOverlay {
-                anchors.fill: netIcon
-                source: netIcon
-                color: panelRoot.colClock
+            Text {
+                text: "↓"
+                font { family: panelRoot.fontFamily; pixelSize: 7 }
+                color: {
+                    var pct = pill.rxSpeed / pill.maxSpeed * 100
+                    if (pct >= 80) return panelRoot.colHigh
+                    if (pct >= 40) return panelRoot.colWarn
+                    if (pill.rxSpeed >= 1024) return "#4ac4e0"
+                    return Qt.rgba(1, 1, 1, 0.25)
+                }
             }
         }
 
@@ -116,7 +122,7 @@ Rectangle {
 
                 function sparkColor(spd, baseColor) {
                     var pct = spd / pill.maxSpeed * 100
-                    return pct >= 80 ? "#e05252" : pct >= 40 ? "#e0c94a" : baseColor
+                    return pct >= 80 ? panelRoot.colHigh.toString() : pct >= 40 ? panelRoot.colWarn.toString() : baseColor
                 }
 
                 function drawSparkline(history, baseY, up, color) {

@@ -86,7 +86,7 @@ Rectangle {
                     for (var col = 0; col < 3; col++) {
                         var idx = row * 3 + col
                         var pct = pill.corePcts[idx] || 0
-                        var color = pct >= 95 ? "#e05252" : pct >= 80 ? "#e0c94a" : "#4ae09a"
+                        var color = pct >= 95 ? panelRoot.colHigh.toString() : pct >= 80 ? panelRoot.colWarn.toString() : "#4ae09a"
                         ctx.beginPath()
                         ctx.arc(xs[col], ys[row], 1.8, 0, Math.PI * 2)
                         ctx.fillStyle = color
@@ -122,7 +122,7 @@ Rectangle {
                 Rectangle {
                     anchors { bottom: parent.bottom; left: parent.left; right: parent.right }
                     height: parent.height * (pill.ramPct / 100)
-                    color: pill.ramPct >= 95 ? "#e05252" : pill.ramPct >= 80 ? "#e0c94a" : "#4aa6e0"
+                    color: pill.ramPct >= 95 ? panelRoot.colHigh : pill.ramPct >= 80 ? panelRoot.colWarn : "#4aa6e0"
                     Behavior on height { NumberAnimation { duration: 400; easing.type: Easing.OutCubic } }
                 }
             }
@@ -152,32 +152,40 @@ Rectangle {
                 Rectangle {
                     anchors { bottom: parent.bottom; left: parent.left; right: parent.right }
                     height: parent.height * (pill.drivePct / 100)
-                    color: pill.drivePct >= 95 ? "#e05252" : pill.drivePct >= 80 ? "#e0c94a" : "#4ae09a"
+                    color: pill.drivePct >= 95 ? panelRoot.colHigh : pill.drivePct >= 80 ? panelRoot.colWarn : "#4ae09a"
                 }
             }
         }
 
-        // Network icon tinted by activity level
-        Item {
-            width: 13; height: 13
+        // Network: ↑/↓ arrows lit by activity
+        Row {
             anchors.verticalCenter: parent.verticalCenter
-            Image {
-                id: netIcon
-                anchors.fill: parent
-                source: "icons/network.svg"
-                smooth: true; mipmap: true
-                sourceSize.width: 13; sourceSize.height: 13
-                visible: false; layer.enabled: true
-            }
-            ColorOverlay {
-                anchors.fill: netIcon
-                source: netIcon
+            spacing: 2
+
+            Text {
+                text: "↑"
+                font { family: panelRoot.fontFamily; pixelSize: 11 }
+                anchors.verticalCenter: parent.verticalCenter
                 color: {
-                    var spd = Math.max(pill.rxSpeed, pill.txSpeed)
-                    if (spd >= 1048576)  return "#e0c94a"
-                    if (spd >= 102400)   return panelRoot.colWsActive
-                    if (spd >= 10240)    return panelRoot.colWsOccupied
-                    return panelRoot.colWsEmpty
+                    var pct = pill.txSpeed / 10485760 * 100
+                    if (pct >= 80) return panelRoot.colHigh
+                    if (pct >= 40) return panelRoot.colWarn
+                    if (pill.txSpeed >= 1024) return "#e07840"
+                    return Qt.rgba(1, 1, 1, 0.25)
+                }
+                Behavior on color { ColorAnimation { duration: 300 } }
+            }
+
+            Text {
+                text: "↓"
+                font { family: panelRoot.fontFamily; pixelSize: 11 }
+                anchors.verticalCenter: parent.verticalCenter
+                color: {
+                    var pct = pill.rxSpeed / 10485760 * 100
+                    if (pct >= 80) return panelRoot.colHigh
+                    if (pct >= 40) return panelRoot.colWarn
+                    if (pill.rxSpeed >= 1024) return "#4ac4e0"
+                    return Qt.rgba(1, 1, 1, 0.25)
                 }
                 Behavior on color { ColorAnimation { duration: 300 } }
             }
@@ -359,7 +367,7 @@ Rectangle {
                     }
                     Text {
                         text: pill.cpuPct + "%"
-                        color: pill.cpuPct >= 95 ? "#e05252" : pill.cpuPct >= 80 ? "#e0c94a" : panelRoot.colWsActive
+                        color: pill.cpuPct >= 95 ? panelRoot.colHigh : pill.cpuPct >= 80 ? panelRoot.colWarn : panelRoot.colWsActive
                         font { family: panelRoot.fontFamily; pixelSize: panelRoot.fontSize - 2; bold: true }
                     }
                 }
@@ -383,7 +391,7 @@ Rectangle {
                             Rectangle {
                                 width: parent.width * (modelData / 100)
                                 height: parent.height; radius: 2
-                                color: modelData >= 95 ? "#e05252" : modelData >= 80 ? "#e0c94a" : panelRoot.colWsActive
+                                color: modelData >= 95 ? panelRoot.colHigh : modelData >= 80 ? panelRoot.colWarn : panelRoot.colWsActive
                             }
                         }
                         Text {
@@ -428,7 +436,7 @@ Rectangle {
                     }
                     Text {
                         text: pill.ramPct + "%"
-                        color: pill.ramPct >= 95 ? "#e05252" : pill.ramPct >= 80 ? "#e0c94a" : panelRoot.colWsActive
+                        color: pill.ramPct >= 95 ? panelRoot.colHigh : pill.ramPct >= 80 ? panelRoot.colWarn : panelRoot.colWsActive
                         font { family: panelRoot.fontFamily; pixelSize: panelRoot.fontSize - 2; bold: true }
                         width: 40
                     }
@@ -446,7 +454,7 @@ Rectangle {
                     Rectangle {
                         width: parent.width * (pill.ramPct / 100)
                         height: parent.height; radius: 2
-                        color: pill.ramPct >= 95 ? "#e05252" : pill.ramPct >= 80 ? "#e0c94a" : "#4aa6e0"
+                        color: pill.ramPct >= 95 ? panelRoot.colHigh : pill.ramPct >= 80 ? panelRoot.colWarn : "#4aa6e0"
                     }
                 }
 
@@ -464,7 +472,7 @@ Rectangle {
                     }
                     Text {
                         text: pill.drivePct + "%"
-                        color: pill.drivePct >= 95 ? "#e05252" : pill.drivePct >= 80 ? "#e0c94a" : panelRoot.colWsActive
+                        color: pill.drivePct >= 95 ? panelRoot.colHigh : pill.drivePct >= 80 ? panelRoot.colWarn : panelRoot.colWsActive
                         font { family: panelRoot.fontFamily; pixelSize: panelRoot.fontSize - 2; bold: true }
                         width: 40
                     }
@@ -482,7 +490,7 @@ Rectangle {
                     Rectangle {
                         width: parent.width * (pill.drivePct / 100)
                         height: parent.height; radius: 2
-                        color: pill.drivePct >= 95 ? "#e05252" : pill.drivePct >= 80 ? "#e0c94a" : "#4ae09a"
+                        color: pill.drivePct >= 95 ? panelRoot.colHigh : pill.drivePct >= 80 ? panelRoot.colWarn : "#4ae09a"
                     }
                 }
 
