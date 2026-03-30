@@ -265,7 +265,7 @@ Rectangle {
                 color: root.colPill
                 radius: 12
                 width: clockRow.width + 16
-                height: clockRow.height + 8
+                height: clockRow.height + 10
 
                 Row {
                     id: clockRow
@@ -299,7 +299,7 @@ Rectangle {
                         id: clock
                         anchors.verticalCenter: parent.verticalCenter
                         color: root.colClock
-                        font { family: root.fontFamily; pixelSize: root.fontSize - 2; bold: true }
+                        font { family: root.fontFamily; pixelSize: root.fontSize; bold: true }
                         text: Qt.formatDateTime(new Date(), "HH:mm")
                         Timer {
                             interval: 1000
