@@ -269,6 +269,9 @@ PanelWindow {
                         width: 30
                         height: 18
 
+                        scale: wsDelegate.isActive ? 1.15 : 1.0
+                        Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutBack } }
+
                         Rectangle {
                             anchors.fill: parent
                             radius: 4
@@ -292,10 +295,21 @@ PanelWindow {
                                         width: Math.max(1, modelData.w * wsInner.width)
                                         height: Math.max(1, modelData.h * wsInner.height)
                                         radius: 1
+                                        opacity: 0
                                         color: modelData.isFocused ? "#ccffffff" : "#55aaaaaa"
                                         border.color: modelData.isFloating ? "#88ffffff" : "transparent"
                                         border.width: modelData.isFloating ? 1 : 0
                                         Behavior on color { ColorAnimation { duration: 100 } }
+                                        Component.onCompleted: {
+                                            fadeIn.start()
+                                        }
+                                        NumberAnimation on opacity {
+                                            id: fadeIn
+                                            from: 0; to: 1
+                                            duration: 150
+                                            easing.type: Easing.OutCubic
+                                            running: false
+                                        }
                                     }
                                 }
                             }

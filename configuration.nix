@@ -86,6 +86,9 @@
   security.rtkit.enable = true;
   security.sudo.wheelNeedsPassword = false;
 
+  services.gnome.gnome-keyring.enable = true;
+  security.pam.services.login.enableGnomeKeyring = true;
+
   services.pipewire = {
     enable = true;
     alsa.enable = true;
