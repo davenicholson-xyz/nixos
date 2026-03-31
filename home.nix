@@ -7,9 +7,9 @@ in
 
   imports = [
     ./modules/nixvim.nix
-      ./modules/tmux.nix
-      ./modules/govista.nix
-      ./modules/kvmux.nix
+    ./modules/tmux.nix
+    ./modules/govista.nix
+    ./modules/kvmux.nix
   ];
 
   home.username = "dave";
@@ -33,6 +33,7 @@ in
 
   home.file.".config/hypr".source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/nixos/config/hypr";
   home.file.".config/niri".source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/nixos/config/niri";
+
   home.file.".config/kitty".source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/nixos/config/kitty";
   home.file.".config/quickshell".source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/nixos/config/quickshell";
 
@@ -59,7 +60,6 @@ in
 
       nerd-fonts.jetbrains-mono
       nerd-fonts.sauce-code-pro
-
 
       niri
       xwayland
@@ -96,6 +96,7 @@ in
 
       ehome = "nvim /home/dave/nixos/home.nix";
       ehypr = "nvim /home/dave/nixos/config/hypr/hyprland.conf";
+      eniri = "nvim /home/dave/nixos/config/niri/config.kdl";
 
       rebuild = "nh os switch --impure";
       update = "nh os switch --impure -u";
@@ -148,8 +149,8 @@ _tmux_rename_session
     settings = {
       username = "fatnic";
       apiKey = apiKey;
-      categories = "101";
-      purity = "110";
+      categories = "111";
+      purity = "111";
       script = "/home/dave/nixos/bin/setwallpaper";
       minResolution = "2560x1440";
     };

@@ -6,12 +6,12 @@ if [ -n "$NIRI_SOCKET" ]; then
         niri msg action focus-window --id "$brave_id"
     else
         niri msg action focus-workspace web
-        brave --password-store=basic &
+        brave &
     fi
 else
     if hyprctl clients -j | grep -q '"class": "brave-browser"'; then
         hyprctl dispatch focuswindow class:brave-browser
     else
-        brave --password-store=basic
+        brave 
     fi
 fi
