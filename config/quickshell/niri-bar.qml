@@ -252,6 +252,13 @@ PanelWindow {
             Behavior on width {
                 NumberAnimation { duration: 150; easing.type: Easing.OutCubic }
             }
+            layer.enabled: true
+            layer.effect: DropShadow {
+                horizontalOffset: 0; verticalOffset: 0
+                radius: 14; samples: 17
+                color: Qt.rgba(1, 1, 1, 0.13)
+                spread: 0.04
+            }
 
             Row {
                 id: workspaceRow
@@ -265,6 +272,7 @@ PanelWindow {
                         id: wsDelegate
                         property bool isActive: root.niriFocusedIdx === modelData.idx
                         property var windowRects: root.windowRectsForWorkspace(modelData.id)
+                        property real borderAlpha: isActive ? 0.8 : 0.267
 
                         width: 30
                         height: 18
@@ -272,13 +280,22 @@ PanelWindow {
                         scale: wsDelegate.isActive ? 1.15 : 1.0
                         Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutBack } }
 
+                        // Pulse the border on the active workspace thumbnail
+                        SequentialAnimation {
+                            running: wsDelegate.isActive
+                            loops: Animation.Infinite
+                            NumberAnimation { target: wsDelegate; property: "borderAlpha"; to: 0.35; duration: 1400; easing.type: Easing.InOutSine }
+                            NumberAnimation { target: wsDelegate; property: "borderAlpha"; to: 0.9;  duration: 1400; easing.type: Easing.InOutSine }
+                        }
+                        onIsActiveChanged: if (!isActive) borderAlpha = 0.267
+
                         Rectangle {
+                            id: wsRect
                             anchors.fill: parent
                             radius: 4
                             color: wsDelegate.isActive ? "#22ffffff" : "transparent"
-                            border.color: wsDelegate.isActive ? "#ccffffff" : "#44ffffff"
+                            border.color: Qt.rgba(1, 1, 1, wsDelegate.borderAlpha)
                             border.width: 1
-                            Behavior on border.color { ColorAnimation { duration: 150 } }
                             Behavior on color { ColorAnimation { duration: 150 } }
                             clip: true
 
@@ -422,6 +439,13 @@ PanelWindow {
                 radius: 12
                 width: clockRow.width + 16
                 height: clockRow.height + 6
+                layer.enabled: true
+                layer.effect: DropShadow {
+                    horizontalOffset: 0; verticalOffset: 0
+                    radius: 10; samples: 17
+                    color: Qt.rgba(1, 1, 1, 0.1)
+                    spread: 0.03
+                }
 
                 Row {
                     id: clockRow
@@ -451,17 +475,35 @@ PanelWindow {
                         }
                     }
 
+                    // HH:mm with blinking colon synced to wall-clock seconds
                     Text {
                         id: clock
                         anchors.verticalCenter: parent.verticalCenter
                         color: root.colClock
                         font { family: root.fontFamily; pixelSize: root.fontSize; bold: true }
                         text: Qt.formatDateTime(new Date(), "HH:mm")
-                        Timer {
-                            interval: 1000
-                            running: true
-                            repeat: true
-                            onTriggered: clock.text = Qt.formatDateTime(new Date(), "HH:mm")
+                    }
+
+                    // :ss — same size as HH:mm, slightly dimmed
+                    Text {
+                        id: clockSecs
+                        anchors.verticalCenter: parent.verticalCenter
+                        color: Qt.rgba(1, 1, 1, 0.6)
+                        font { family: root.fontFamily; pixelSize: root.fontSize; bold: true }
+                        text: "00"
+                    }
+
+                    Timer {
+                        interval: 1000
+                        running: true
+                        repeat: true
+                        onTriggered: {
+                            var d = new Date()
+                            var h = String(d.getHours()).padStart(2, '0')
+                            var m = String(d.getMinutes()).padStart(2, '0')
+                            var s = String(d.getSeconds()).padStart(2, '0')
+                            clock.text = h + (d.getSeconds() % 2 === 0 ? ":" : " ") + m
+                            clockSecs.text = s
                         }
                     }
                 }

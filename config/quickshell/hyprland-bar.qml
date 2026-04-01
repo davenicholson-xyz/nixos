@@ -131,6 +131,13 @@ PanelWindow {
             radius: 12
             width: workspaceRow.width + 16
             height: workspaceRow.height + 8
+            layer.enabled: true
+            layer.effect: DropShadow {
+                horizontalOffset: 0; verticalOffset: 0
+                radius: 14; samples: 17
+                color: Qt.rgba(1, 1, 1, 0.13)
+                spread: 0.04
+            }
 
             Row {
                 id: workspaceRow
@@ -144,6 +151,20 @@ PanelWindow {
                         property bool isActive: Hyprland.focusedWorkspace?.id === (index + 1)
                         property color wsColor: isActive ? root.colWsActive : (ws ? root.colWsOccupied : root.colWsEmpty)
                         width: 16; height: 16
+
+                        scale: isActive ? 1.15 : 1.0
+                        Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutBack } }
+
+                        // Halo ring behind icon — slides in when workspace becomes active
+                        Rectangle {
+                            anchors.fill: parent
+                            radius: 4
+                            color: parent.isActive ? Qt.rgba(1, 1, 1, 0.1) : "transparent"
+                            border.color: parent.isActive ? Qt.rgba(1, 1, 1, 0.45) : "transparent"
+                            border.width: 1
+                            Behavior on color        { ColorAnimation { duration: 200 } }
+                            Behavior on border.color { ColorAnimation { duration: 200 } }
+                        }
 
                         Image {
                             id: wsIcon
@@ -161,10 +182,12 @@ PanelWindow {
                             anchors.fill: wsIcon
                             source: wsIcon
                             color: parent.wsColor
+                            Behavior on color { ColorAnimation { duration: 150 } }
                         }
 
                         MouseArea {
                             anchors.fill: parent
+                            cursorShape: Qt.PointingHandCursor
                             onClicked: Hyprland.dispatch("workspace " + (index + 1))
                         }
                     }
@@ -266,6 +289,13 @@ Rectangle {
                 radius: 12
                 width: clockRow.width + 16
                 height: clockRow.height + 10
+                layer.enabled: true
+                layer.effect: DropShadow {
+                    horizontalOffset: 0; verticalOffset: 0
+                    radius: 10; samples: 17
+                    color: Qt.rgba(1, 1, 1, 0.1)
+                    spread: 0.03
+                }
 
                 Row {
                     id: clockRow
@@ -295,17 +325,36 @@ Rectangle {
                         }
                     }
 
+                    // HH:mm with blinking colon synced to wall-clock seconds
                     Text {
                         id: clock
                         anchors.verticalCenter: parent.verticalCenter
                         color: root.colClock
                         font { family: root.fontFamily; pixelSize: root.fontSize; bold: true }
                         text: Qt.formatDateTime(new Date(), "HH:mm")
-                        Timer {
-                            interval: 1000
-                            running: true
-                            repeat: true
-                            onTriggered: clock.text = Qt.formatDateTime(new Date(), "HH:mm")
+                    }
+
+                    // :ss — same size as HH:mm, slightly dimmed
+                    Text {
+                        id: clockSecs
+                        anchors.verticalCenter: parent.verticalCenter
+                        color: Qt.rgba(1, 1, 1, 0.6)
+                        font { family: root.fontFamily; pixelSize: root.fontSize; bold: true }
+                        text: "00"
+                    }
+
+                    Timer {
+                        interval: 1000
+                        running: true
+                        repeat: true
+                        onTriggered: {
+                            var d = new Date()
+                            var h = String(d.getHours()).padStart(2, '0')
+                            var m = String(d.getMinutes()).padStart(2, '0')
+                            var s = String(d.getSeconds()).padStart(2, '0')
+                            // Colon blinks on odd seconds (synced to wall clock)
+                            clock.text = h + (d.getSeconds() % 2 === 0 ? ":" : " ") + m
+                            clockSecs.text = s
                         }
                     }
                 }
