@@ -1,8 +1,5 @@
 { config, pkgs, lib, govista, nixvim, kvmux, ... }:
 
-let 
-apiKey = lib.strings.trim(builtins.readFile "/home/dave/.secrets/wallhaven-api-key");
-in 
 {
 
   imports = [
@@ -36,6 +33,7 @@ in
 
   home.file.".config/kitty".source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/nixos/config/kitty";
   home.file.".config/quickshell".source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/nixos/config/quickshell";
+  home.file.".config/govista".source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/nixos/config/govista";
 
   home.packages = with pkgs; [
       brave
@@ -145,17 +143,7 @@ _tmux_rename_session
 
   programs.kvmux.enable = true;
 
-  programs.govista = {
-    enable = true;
-    settings = {
-      username = "fatnic";
-      apiKey = apiKey;
-      categories = "101";
-      purity = "111";
-      script = "/home/dave/nixos/bin/setwallpaper";
-      minResolution = "2560x1440";
-    };
-  };
+  programs.govista.enable = true;
 
   programs.lazygit = {
     enable = true;
