@@ -11,18 +11,23 @@
 
     };
 
+    claude-code.url = "github:sadjow/claude-code-nix";
+
     govista.url = "github:davenicholson-xyz/govista";
     nixvim.url = "github:nix-community/nixvim";
     kvmux.url = "github:davenicholson-xyz/kvmux";
   };
 
-  outputs = { self, nixpkgs, home-manager, govista, nixvim, kvmux, ... }:
+  outputs = { self, nixpkgs, home-manager, claude-code, govista, nixvim, kvmux, ... }:
   {
     nixosConfigurations = {
       nixos = nixpkgs.lib.nixosSystem {
         specialArgs = { inherit kvmux; };
         modules = [
-          { nixpkgs.hostPlatform.system = "x86_64-linux"; }
+          { 
+           nixpkgs.hostPlatform.system = "x86_64-linux"; 
+           nixpkgs.overlays = [ claude-code.overlays.default ];
+          }
           ./configuration.nix
           ./modules/kvmux-service.nix
           home-manager.nixosModules.home-manager

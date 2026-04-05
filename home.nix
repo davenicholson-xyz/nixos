@@ -39,7 +39,8 @@ in
 
   home.packages = with pkgs; [
       brave
-      swww
+      # swww
+      awww
       kitty
       gh
       claude-code
@@ -149,7 +150,7 @@ _tmux_rename_session
     settings = {
       username = "fatnic";
       apiKey = apiKey;
-      categories = "111";
+      categories = "101";
       purity = "111";
       script = "/home/dave/nixos/bin/setwallpaper";
       minResolution = "2560x1440";

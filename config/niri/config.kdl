@@ -62,7 +62,7 @@ layout {
 }
 
 spawn-at-startup "qs" "-d" "-p" "/home/dave/.config/quickshell/niri-bar.qml"
-spawn-at-startup "swww-daemon"
+spawn-at-startup "awww-daemon"
 spawn-at-startup "gnome-keyring-daemon" "--start" "--components=secrets"
 
 hotkey-overlay { skip-at-startup; }
