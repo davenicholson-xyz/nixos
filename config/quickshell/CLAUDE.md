@@ -14,7 +14,6 @@ A [Quickshell](https://quickshell.outfoxxed.me/) status bar written in QML, targ
 
 - **Left:** `SpotifyPill` + `LauncherPill` (Row, anchored left)
 - **Center:** `workspacePill` — always `anchors.centerIn: parent`; never push it into a layout or it loses true centering
-- **Just left of center:** `ClaudePill` — anchored `right: workspacePill.left` so it floats without affecting centering
 - **Right:** `CpuPill`, `RamPill`, `DrivePill`, `NetworkPill` (staggered show/hide) + arrow toggle + `ClockPill`
 
 ### Component conventions
@@ -42,19 +41,12 @@ All colors are properties on `root`: `colBg`, `colPill`, `colWsActive`, `colWsOc
 | Disk | `df` |
 | Network | `/proc/net/dev` |
 | Spotify | `playerctl -p spotify` + `cava` for visualizer |
-| Claude | `~/.claude/waiting-for-input` flag file + `pgrep -x claude` |
 
 ### SpotifyPill specifics
 
 - Runs `cava` as a subprocess (only while `status === "Playing"`) reading from `cava.cfg`
 - `cava.cfg` uses `bars = 24, channels = mono` — the QML takes `slice(0, 12)` to get the non-mirrored half
 - Popup shows full-bleed album art with a gradient scrim and info overlay
-
-### ClaudePill specifics
-
-Shows and pulses when `~/.claude/waiting-for-input` exists **and** a `claude` process is running. The flag is written/cleared by hooks in `~/.claude/settings.json`:
-- `Notification` hook → `touch ~/.claude/waiting-for-input`
-- `PreToolUse`, `PostToolUse`, `Stop` hooks → `rm -f ~/.claude/waiting-for-input`
 
 ## Key Quickshell APIs
 

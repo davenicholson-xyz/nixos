@@ -86,7 +86,7 @@ Rectangle {
                     for (var col = 0; col < 3; col++) {
                         var idx = row * 3 + col
                         var pct = pill.corePcts[idx] || 0
-                        var color = pct >= 95 ? panelRoot.colHigh.toString() : pct >= 80 ? panelRoot.colWarn.toString() : "#4ae09a"
+                        var color = pct >= 95 ? panelRoot.colHigh.toString() : pct >= 80 ? panelRoot.colWarn.toString() : "#aaaaaa"
                         ctx.beginPath()
                         ctx.arc(xs[col], ys[row], 1.8, 0, Math.PI * 2)
                         ctx.fillStyle = color
@@ -122,7 +122,7 @@ Rectangle {
                 Rectangle {
                     anchors { bottom: parent.bottom; left: parent.left; right: parent.right }
                     height: parent.height * (pill.ramPct / 100)
-                    color: pill.ramPct >= 95 ? panelRoot.colHigh : pill.ramPct >= 80 ? panelRoot.colWarn : "#4aa6e0"
+                    color: pill.ramPct >= 95 ? panelRoot.colHigh : pill.ramPct >= 80 ? panelRoot.colWarn : "#aaaaaa"
                     Behavior on height { NumberAnimation { duration: 400; easing.type: Easing.OutCubic } }
                 }
             }
@@ -152,7 +152,7 @@ Rectangle {
                 Rectangle {
                     anchors { bottom: parent.bottom; left: parent.left; right: parent.right }
                     height: parent.height * (pill.drivePct / 100)
-                    color: pill.drivePct >= 95 ? panelRoot.colHigh : pill.drivePct >= 80 ? panelRoot.colWarn : "#4ae09a"
+                    color: pill.drivePct >= 95 ? panelRoot.colHigh : pill.drivePct >= 80 ? panelRoot.colWarn : "#aaaaaa"
                 }
             }
         }
@@ -170,7 +170,7 @@ Rectangle {
                     var pct = pill.txSpeed / 10485760 * 100
                     if (pct >= 80) return panelRoot.colHigh
                     if (pct >= 40) return panelRoot.colWarn
-                    if (pill.txSpeed >= 1024) return "#e07840"
+                    if (pill.txSpeed >= 1024) return "#aaaaaa"
                     return Qt.rgba(1, 1, 1, 0.25)
                 }
                 Behavior on color { ColorAnimation { duration: 300 } }
@@ -184,7 +184,7 @@ Rectangle {
                     var pct = pill.rxSpeed / 10485760 * 100
                     if (pct >= 80) return panelRoot.colHigh
                     if (pct >= 40) return panelRoot.colWarn
-                    if (pill.rxSpeed >= 1024) return "#4ac4e0"
+                    if (pill.rxSpeed >= 1024) return "#aaaaaa"
                     return Qt.rgba(1, 1, 1, 0.25)
                 }
                 Behavior on color { ColorAnimation { duration: 300 } }
@@ -454,7 +454,7 @@ Rectangle {
                     Rectangle {
                         width: parent.width * (pill.ramPct / 100)
                         height: parent.height; radius: 2
-                        color: pill.ramPct >= 95 ? panelRoot.colHigh : pill.ramPct >= 80 ? panelRoot.colWarn : "#4aa6e0"
+                        color: pill.ramPct >= 95 ? panelRoot.colHigh : pill.ramPct >= 80 ? panelRoot.colWarn : "#aaaaaa"
                     }
                 }
 
@@ -490,7 +490,7 @@ Rectangle {
                     Rectangle {
                         width: parent.width * (pill.drivePct / 100)
                         height: parent.height; radius: 2
-                        color: pill.drivePct >= 95 ? panelRoot.colHigh : pill.drivePct >= 80 ? panelRoot.colWarn : "#4ae09a"
+                        color: pill.drivePct >= 95 ? panelRoot.colHigh : pill.drivePct >= 80 ? panelRoot.colWarn : "#aaaaaa"
                     }
                 }
 
