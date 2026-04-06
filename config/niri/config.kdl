@@ -33,6 +33,7 @@ output "HDMI-A-1" {
 layout {
     gaps 8 
     center-focused-column "never"
+    always-center-single-column
     preset-column-widths {
         proportion 0.33333
         proportion 0.5
@@ -89,7 +90,8 @@ window-rule {
 
 window-rule {
     match  app-id=r#"^brave-browser$"#
-    open-maximized true
+    default-column-width { proportion 0.66667; }
+    // open-floating true
     open-on-workspace "web"
 }
 
