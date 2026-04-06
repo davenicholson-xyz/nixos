@@ -438,7 +438,7 @@ PanelWindow {
                 color: root.colPill
                 radius: 12
                 width: clockRow.width + 16
-                height: clockRow.height + 6
+                height: clockRow.height + 8
                 layer.enabled: true
                 layer.effect: DropShadow {
                     horizontalOffset: 0; verticalOffset: 0
