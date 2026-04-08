@@ -39,7 +39,7 @@ layout {
         proportion 0.5
         proportion 0.66667
     }
-    default-column-width { proportion 0.5; }
+    default-column-width { proportion 0.6667; }
     focus-ring {
         width 1
         active-color "#7fc8ff"
@@ -54,8 +54,8 @@ layout {
     }
     shadow {
         on
-        softness 30
-        spread 5
+        softness 20
+        spread 5 
         offset x=0 y=5
         color "#0007"
     }
@@ -83,21 +83,23 @@ window-rule {
 
 window-rule {
     match  app-id=r#"^govista$"#
-    open-floating true
     default-column-width { fixed 1200; }
     default-window-height { fixed 800; }
+    open-floating true
+}
+
+window-rule {
+    match  app-id=r#"^kitty$"#
+    open-on-workspace "code"
 }
 
 window-rule {
     match  app-id=r#"^brave-browser$"#
-    default-column-width { proportion 0.66667; }
-    // open-floating true
     open-on-workspace "web"
 }
 
 window-rule {
     match  app-id=r#"^spotify$"#
-    open-maximized true
     open-on-workspace "spotify"
 }
 

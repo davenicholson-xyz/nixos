@@ -37,9 +37,7 @@
 
   home.packages = with pkgs; [
       brave
-      # swww
       awww
-      kitty
       gh
       claude-code
       yazi
@@ -59,9 +57,6 @@
 
       nerd-fonts.jetbrains-mono
       nerd-fonts.sauce-code-pro
-
-      niri
-      xwayland
   ];
 
   programs.fzf = {
@@ -89,7 +84,7 @@
 
     shellAliases = {
       ll = "ls -l";
-      lg = "lazygit"; 
+      # lg = "lazygit"; 
       ssh = "ssh-hypr";
       currentwp = ''xdg-open https://wallhaven.cc/w/$(swww query | grep -oP '(?<=image: )[^\s,]+' | cut -d"/" -f6 | cut -d. -f1)'';
 

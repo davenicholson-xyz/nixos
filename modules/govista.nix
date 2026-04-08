@@ -8,6 +8,6 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
-    home.packages = [ govista.packages.${pkgs.system}.default ];
+    home.packages = [ govista.packages.${pkgs.stdenv.hostPlatform.system}.default ];
   };
 }

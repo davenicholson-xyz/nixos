@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ pkgs, ... }:
 
 {
   imports =
@@ -13,10 +13,10 @@
   boot.kernelPackages = pkgs.linuxPackages_latest;
   boot.kernelParams = [ "usbcore.autosuspend=-1" "i915.enable_guc=3" ];
 
-  services.upower.enable = false; # if you don't need it
+  services.upower.enable = false; 
   powerManagement.enable = false;
 
-  networking.hostName = "nixos"; # Define your hostname.
+  networking.hostName = "nixos"; 
 
   networking.networkmanager.enable = true;
 
@@ -39,12 +39,13 @@
   environment.sessionVariables = {
     LIBVA_DRIVER_NAME = "iHD";
     NIXOS_OZONE_WL = "1"; 
+    QML_IMPORT_PATH = "${pkgs.qt6.qt5compat}/lib/qt-6/qml";
   };
 
   hardware.graphics = {
     enable = true;
     extraPackages = with pkgs; [
-        intel-media-driver  # iHD, for 8th gen+
+      intel-media-driver 
         intel-vaapi-driver
         libva-vdpau-driver
         libvdpau-va-gl
@@ -111,7 +112,7 @@
   nixpkgs.config.allowUnfree = true;
 
   environment.systemPackages = with pkgs; [
-    kitty
+      kitty
       neovim
       git
       tree
@@ -124,21 +125,18 @@
       quickshell
       qt6.qt5compat
 
-      ydotool
+      xwayland
   ];
 
   services.transmission = {
-  enable = true;
-  settings = {
-    download-dir = "/home/dave/Downloads";
-    rpc-bind-address = "127.0.0.1"; # Only allow local access
+    enable = true;
+    settings = {
+      download-dir = "/home/dave/Downloads";
+      rpc-bind-address = "127.0.0.1"; 
+    };
   };
-};
-systemd.services.transmission.serviceConfig.ReadWritePaths = [ "/home/dave/Downloads" ];
 
-  environment.sessionVariables = {
-    QML_IMPORT_PATH = "${pkgs.qt6.qt5compat}/lib/qt-6/qml";
-  };
+  systemd.services.transmission.serviceConfig.ReadWritePaths = [ "/home/dave/Downloads" ];
 
   services.openssh.enable = true;
 
@@ -148,7 +146,6 @@ systemd.services.transmission.serviceConfig.ReadWritePaths = [ "/home/dave/Downl
 
   networking.firewall.allowedTCPPorts = [ 7777 4242 ];
 
-
-  system.stateVersion = "25.11"; # Did you read the comment?
+  system.stateVersion = "25.11"; 
 
 }

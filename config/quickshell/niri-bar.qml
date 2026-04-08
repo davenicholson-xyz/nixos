@@ -475,35 +475,47 @@ PanelWindow {
                         }
                     }
 
-                    // HH:mm with blinking colon synced to wall-clock seconds
-                    Text {
-                        id: clock
+                    // HH:mm — each digit slides in from above when it changes
+                    Row {
                         anchors.verticalCenter: parent.verticalCenter
-                        color: root.colClock
-                        font { family: root.fontFamily; pixelSize: root.fontSize; bold: true }
-                        text: Qt.formatDateTime(new Date(), "HH:mm")
+                        spacing: 0
+
+                        AnimatedDigit { id: dH1; digit: "0"; textColor: root.colClock; fontFamily: root.fontFamily; fontSize: root.fontSize; fontBold: true }
+                        AnimatedDigit { id: dH2; digit: "0"; textColor: root.colClock; fontFamily: root.fontFamily; fontSize: root.fontSize; fontBold: true }
+                        Text {
+                            id: clockColon
+                            text: ":"
+                            color: root.colClock
+                            font { family: root.fontFamily; pixelSize: root.fontSize; bold: true }
+                            anchors.verticalCenter: parent.verticalCenter
+                        }
+                        AnimatedDigit { id: dM1; digit: "0"; textColor: root.colClock; fontFamily: root.fontFamily; fontSize: root.fontSize; fontBold: true }
+                        AnimatedDigit { id: dM2; digit: "0"; textColor: root.colClock; fontFamily: root.fontFamily; fontSize: root.fontSize; fontBold: true }
                     }
 
-                    // :ss — same size as HH:mm, slightly dimmed
-                    Text {
-                        id: clockSecs
+                    // ss — dimmed, also animated
+                    Row {
                         anchors.verticalCenter: parent.verticalCenter
-                        color: Qt.rgba(1, 1, 1, 0.6)
-                        font { family: root.fontFamily; pixelSize: root.fontSize; bold: true }
-                        text: "00"
+                        spacing: 0
+
+                        AnimatedDigit { id: dS1; digit: "0"; textColor: Qt.rgba(1, 1, 1, 0.6); fontFamily: root.fontFamily; fontSize: root.fontSize; fontBold: true }
+                        AnimatedDigit { id: dS2; digit: "0"; textColor: Qt.rgba(1, 1, 1, 0.6); fontFamily: root.fontFamily; fontSize: root.fontSize; fontBold: true }
                     }
 
                     Timer {
                         interval: 1000
                         running: true
                         repeat: true
+                        triggeredOnStart: true
                         onTriggered: {
                             var d = new Date()
                             var h = String(d.getHours()).padStart(2, '0')
                             var m = String(d.getMinutes()).padStart(2, '0')
                             var s = String(d.getSeconds()).padStart(2, '0')
-                            clock.text = h + (d.getSeconds() % 2 === 0 ? ":" : " ") + m
-                            clockSecs.text = s
+                            dH1.digit = h[0]; dH2.digit = h[1]
+                            clockColon.text = d.getSeconds() % 2 === 0 ? ":" : " "
+                            dM1.digit = m[0]; dM2.digit = m[1]
+                            dS1.digit = s[0]; dS2.digit = s[1]
                         }
                     }
                 }

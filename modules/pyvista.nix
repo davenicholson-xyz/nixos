@@ -73,7 +73,7 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
-    home.packages = [ pyvista.packages.${pkgs.system}.default ];
+    home.packages = [ pyvista.packages.${pkgs.stdenv.hostPlatform.system}.default ];
 
     xdg.configFile."pyvista/config.toml".source = configFile;
   };

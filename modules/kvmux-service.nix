@@ -8,7 +8,7 @@
       after = [ "network.target" ];
       wantedBy = [ "multi-user.target" ];
       serviceConfig = {
-        ExecStart = "${kvmux.packages.${pkgs.system}.default}/bin/kvmux-server";
+        ExecStart = "${kvmux.packages.${pkgs.stdenv.hostPlatform.system}.default}/bin/kvmux-server";
         Restart = "on-failure";
       };
     };
