@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 
 {
   imports =
@@ -12,6 +12,8 @@
 
   boot.kernelPackages = pkgs.linuxPackages_latest;
   boot.kernelParams = [ "usbcore.autosuspend=-1" "i915.enable_guc=3" ];
+  boot.extraModulePackages = [ config.boot.kernelPackages.v4l2loopback ];
+  boot.kernelModules = [ "v4l2loopback" ];
 
   services.upower.enable = false; 
   powerManagement.enable = false;
@@ -121,6 +123,7 @@
       wlogout
       playerctl
       tremc
+      ffmpeg
 
       quickshell
       qt6.qt5compat

@@ -43,7 +43,9 @@
       yazi
       spotify
       thunderbird
+
       mpv
+      mpvpaper
 
       ripgrep
       jq
