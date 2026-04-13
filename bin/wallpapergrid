@@ -1,0 +1,130 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+FILM=0
+SORT=0
+CACHED=0
+QUERY_PARTS=()
+for arg in "$@"; do
+    case "$arg" in
+        --film)   FILM=1 ;;
+        --sort)   SORT=1 ;;
+        --cached) CACHED=1 ;;
+        *)        QUERY_PARTS+=("$arg") ;;
+    esac
+done
+
+if [[ $CACHED -eq 0 && ${#QUERY_PARTS[@]} -eq 0 ]]; then
+    echo "Usage: wallpapergrid [--film] [--sort] [--cached] <query>" >&2
+    exit 1
+fi
+
+QUERY="${QUERY_PARTS[*]}"
+CONFIG="$HOME/.config/govista/config.toml"
+
+API_KEY=$(grep '^api_key'    "$CONFIG" | sed 's/.*= *"\(.*\)".*/\1/')
+SETTER=$(grep  '^script'     "$CONFIG" | sed 's/.*= *"\(.*\)".*/\1/')
+THUMB_SIZE=$(grep '^thumb-size' "$CONFIG" | sed 's/.*= *//')
+
+# Detect desktop resolution
+if [[ -n "${NIRI_SOCKET:-}" ]]; then
+    read -r WIDTH HEIGHT < <(niri msg -j outputs | jq -r 'first(.[]) | .modes[.current_mode] | "\(.width) \(.height)"')
+elif command -v xrandr &>/dev/null; then
+    read -r WIDTH HEIGHT < <(xrandr | grep -oP '\d+x\d+(?=\+)' | head -1 | tr 'x' ' ')
+fi
+WIDTH=${WIDTH:-2560}
+HEIGHT=${HEIGHT:-1440}
+
+THUMB_W=$THUMB_SIZE
+THUMB_H=$((THUMB_SIZE * 9 / 16))
+COLS=$((WIDTH / THUMB_W))
+ROWS=$((HEIGHT / THUMB_H))
+TOTAL=$((COLS * ROWS))
+
+CACHE_DIR="$HOME/.cache/wallpapergrid"
+THUMB_DIR="$CACHE_DIR/thumbs"
+mkdir -p "$THUMB_DIR"
+
+echo "Grid: ${COLS}x${ROWS} = $TOTAL thumbs (${WIDTH}x${HEIGHT} @ ${THUMB_SIZE}px)"
+
+if [[ $CACHED -eq 0 ]]; then
+    rm -f "$THUMB_DIR"/*.jpg
+
+    # Fetch thumbnail URLs, paginating until we have enough
+    # seed pins the random order so pages are consistent across requests
+    SEED=$(printf '%04x' $((RANDOM * RANDOM)))
+    declare -a THUMB_URLS=()
+    page=1
+    while [[ ${#THUMB_URLS[@]} -lt $TOTAL ]]; do
+        mapfile -t batch < <(
+            curl -sf -G "https://wallhaven.cc/api/v1/search" \
+                --data-urlencode "q=$QUERY" \
+                -d "apikey=$API_KEY&sorting=random&seed=$SEED&per_page=24&page=$page" \
+            | jq -r '.data[].thumbs.large'
+        )
+        [[ ${#batch[@]} -eq 0 ]] && break
+        THUMB_URLS+=("${batch[@]}")
+        ((page++))
+    done
+
+    if [[ ${#THUMB_URLS[@]} -eq 0 ]]; then
+        echo "No results for query: $QUERY" >&2
+        exit 1
+    fi
+
+    # Trim to TOTAL
+    THUMB_URLS=("${THUMB_URLS[@]:0:$TOTAL}")
+
+    echo "Downloading ${#THUMB_URLS[@]} thumbnails..."
+
+    i=0
+    for url in "${THUMB_URLS[@]}"; do
+        curl -sf -o "$THUMB_DIR/$(printf '%04d' $i).jpg" "$url" &
+        i=$((i+1))
+    done
+    wait
+
+    # Fill grid by randomly repeating images if not enough results
+    mapfile -t files < <(printf '%s\n' "$THUMB_DIR"/*.jpg | sort)
+    count=${#files[@]}
+    if [[ $count -lt $TOTAL ]]; then
+        extra=$((TOTAL - count))
+        for ((j=0; j<extra; j++)); do
+            cp "${files[$((RANDOM % count))]}" "$THUMB_DIR/fill_$(printf '%04d' $j).jpg"
+        done
+    fi
+fi
+
+echo "Generating grid..."
+
+OUTPUT="$CACHE_DIR/grid.jpg"
+mapfile -t all_files < <(printf '%s\n' "$THUMB_DIR"/*.jpg | sort | head -"$TOTAL")
+
+if [[ $SORT -eq 1 ]]; then
+    echo "Sorting by brightness..."
+    mapfile -t all_files < <(
+        for f in "${all_files[@]}"; do
+            b=$(magick "$f" -scale 1x1! -colorspace gray -format "%[fx:u]" info:)
+            echo "$b $f"
+        done | sort -n | awk '{print $2}'
+    )
+fi
+
+row_imgs=()
+for ((row=0; row<ROWS; row++)); do
+    row_slice=("${all_files[@]:$((row*COLS)):$COLS}")
+    resize_args=()
+    for f in "${row_slice[@]}"; do
+        resize_args+=( "(" "$f" -resize "${THUMB_W}x${THUMB_H}!" ")" )
+    done
+    row_img="$CACHE_DIR/row_${row}.jpg"
+    magick "${resize_args[@]}" +append "$row_img"
+    row_imgs+=("$row_img")
+done
+magick "${row_imgs[@]}" -append "$OUTPUT"
+rm -f "$CACHE_DIR"/row_*.jpg
+
+[[ $FILM -eq 1 ]] && magick "$OUTPUT" -fx "u*0.8+0.1" "$OUTPUT"
+
+echo "Setting wallpaper..."
+"$SETTER" "$OUTPUT"

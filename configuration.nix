@@ -124,11 +124,14 @@
       playerctl
       tremc
       ffmpeg
+      imagemagick
 
       quickshell
       qt6.qt5compat
 
       xwayland
+
+      godot-mono
   ];
 
   services.transmission = {
