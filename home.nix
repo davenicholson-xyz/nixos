@@ -59,6 +59,8 @@
 
       nerd-fonts.jetbrains-mono
       nerd-fonts.sauce-code-pro
+
+      cava-bg
   ];
 
   programs.fzf = {

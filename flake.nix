@@ -26,7 +26,12 @@
         modules = [
           { 
            nixpkgs.hostPlatform.system = "x86_64-linux"; 
-           nixpkgs.overlays = [ claude-code.overlays.default ];
+           nixpkgs.overlays = [ 
+              claude-code.overlays.default 
+              (final: prev: {
+                cava-bg = prev.callPackage ./pkgs/cava-bg.nix {};
+              })
+            ];
           }
           ./configuration.nix
           ./modules/kvmux-service.nix
