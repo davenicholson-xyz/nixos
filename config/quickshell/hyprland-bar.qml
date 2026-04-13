@@ -9,17 +9,18 @@ import Qt5Compat.GraphicalEffects
 PanelWindow {
     id: root
 
-    property color colBg: "#00000000"
-    property color colPill: "#cc000000"
-    property color colWsActive: "#ffffff"
-    property color colWsOccupied: "#999999"
-    property color colWsEmpty: "#555555"
-    property color colClock: "#ffffff"
-    property color colBarTrack: root.colWsEmpty
-    property color colHigh: "#e05252"
-    property color colWarn: "#e0c94a"
-    property string fontFamily: "SauceCodePro Nerd Font"
-    property int fontSize: 13
+    Theme { id: theme }
+    property color colBg:         theme.colBg
+    property color colPill:       theme.colPill
+    property color colWsActive:   theme.colWsActive
+    property color colWsOccupied: theme.colWsOccupied
+    property color colWsEmpty:    theme.colWsEmpty
+    property color colClock:      theme.colClock
+    property color colBarTrack:   theme.colBarTrack
+    property color colHigh:       theme.colHigh
+    property color colWarn:       theme.colWarn
+    property string fontFamily:   theme.fontFamily
+    property int fontSize:        theme.fontSize
     property var wsIcons: ["icons/terminal.svg", "icons/browser.svg", "icons/video.svg", "icons/music.svg"]
     property bool pillsVisible: true
     property bool kvmConnected: false
