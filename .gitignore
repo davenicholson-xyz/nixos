@@ -1,2 +1,3 @@
 hardware-configuration.nix
 /CLAUDE.md
+/.secrets/smb-credentials

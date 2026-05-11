@@ -45,22 +45,24 @@
       thunderbird
 
       mpv
-      mpvpaper
 
       ripgrep
       jq
       grim
       slurp
+      unrar
       fastfetch
       trash-cli
       nh
       btop
       cava
+      # cava-bg
+
+      godot
 
       nerd-fonts.jetbrains-mono
       nerd-fonts.sauce-code-pro
-
-      cava-bg
+      nerd-fonts.fantasque-sans-mono
   ];
 
   programs.fzf = {

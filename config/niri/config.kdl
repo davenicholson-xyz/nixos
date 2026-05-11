@@ -107,10 +107,12 @@ binds {
     Mod+Shift+Slash { show-hotkey-overlay; }
 
     Mod+Return { spawn "kitty"; }
+    Mod+E { spawn-sh "kitty -e yazi ."; }
     Mod+B { spawn-sh "focus-or-open-brave"; }
     Mod+Shift+N { spawn-sh "brave --new-window --incognito --user-data-dir='/tmp/brave-vpn' --proxy-server='http://172.16.20.99:8888'"; }
     Mod+W { spawn-sh "govista -R"; }
     Mod+S { spawn "spotify"; }
+    Mod+Shift+C { spawn "toggle-cava-bg"; }
     Mod+Shift+S { spawn-sh "grim -g \"$(slurp)\" /home/dave/$(date +%Y%m%m_%H%M%S).png"; }
 
     Mod+D hotkey-overlay-title="Toggle launcher" { spawn-sh "echo toggleLauncher > /tmp/qs-niri-ipc"; }

@@ -8,10 +8,10 @@
 
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
-  boot.loader.systemd-boot.configurationLimit = 10;
+  boot.loader.systemd-boot.configurationLimit = 5;
 
   boot.kernelPackages = pkgs.linuxPackages_latest;
-  boot.kernelParams = [ "usbcore.autosuspend=-1" "i915.enable_guc=3" ];
+  boot.kernelParams = [ "usbcore.autosuspend=-1" "i915.enable_guc=3" "i915.enable_dc=0" "intel_idle.max_cstate=2" ];
   boot.extraModulePackages = [ config.boot.kernelPackages.v4l2loopback ];
   boot.kernelModules = [ "v4l2loopback" ];
 
@@ -42,6 +42,21 @@
     LIBVA_DRIVER_NAME = "iHD";
     NIXOS_OZONE_WL = "1"; 
     QML_IMPORT_PATH = "${pkgs.qt6.qt5compat}/lib/qt-6/qml";
+  };
+
+  fileSystems."/mnt/data" = {
+    device = "//172.16.50.10/data";
+    fsType = "cifs";
+    options = [
+        "credentials=/home/dave/nixos/.secrets/smb-credentials"
+        "uid=1000"
+        "gid=1000"
+        "noauto"
+        "x-systemd.automount"
+        "x-systemd.idle-timeout=60"
+        "x-systemd.device-timeout=5s"
+        "x-systemd.mount-timeout=5s"
+    ];
   };
 
   hardware.graphics = {
@@ -114,7 +129,7 @@
   nixpkgs.config.allowUnfree = true;
 
   environment.systemPackages = with pkgs; [
-      kitty
+    kitty
       neovim
       git
       tree
@@ -125,13 +140,12 @@
       tremc
       ffmpeg
       imagemagick
+      cifs-utils
 
       quickshell
       qt6.qt5compat
 
       xwayland
-
-      godot-mono
   ];
 
   services.transmission = {
