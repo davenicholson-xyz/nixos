@@ -4,9 +4,9 @@
 
   imports = [
     ./modules/nixvim.nix
-    ./modules/tmux.nix
-    ./modules/govista.nix
-    ./modules/kvmux.nix
+      ./modules/tmux.nix
+      ./modules/govista.nix
+      ./modules/kvmux.nix
   ];
 
   home.username = "dave";
@@ -43,6 +43,8 @@
       yazi
       spotify
       thunderbird
+      gimp
+      nemo
 
       mpv
 
@@ -56,14 +58,15 @@
       nh
       btop
       cava
-      # cava-bg
+# cava-bg
 
-      godot
+      godot-mono
+      dotnetCorePackages.dotnet_9.sdk
 
       nerd-fonts.jetbrains-mono
       nerd-fonts.sauce-code-pro
       nerd-fonts.fantasque-sans-mono
-  ];
+      ];
 
   programs.fzf = {
     enable = true;
@@ -71,8 +74,8 @@
   };
 
   programs.zoxide = {
-      enable = true;
-      enableZshIntegration = true;
+    enable = true;
+    enableZshIntegration = true;
   };
 
   programs.zsh = {
@@ -90,7 +93,7 @@
 
     shellAliases = {
       ll = "ls -l";
-      # lg = "lazygit"; 
+# lg = "lazygit"; 
       ssh = "ssh-hypr";
       currentwp = ''xdg-open https://wallhaven.cc/w/$(swww query | grep -oP '(?<=image: )[^\s,]+' | cut -d"/" -f6 | cut -d. -f1)'';
 
@@ -105,22 +108,22 @@
 
 
     initContent = ''
-autoload -Uz vcs_info add-zsh-hook
-precmd() { vcs_info }
-zstyle ':vcs_info:git:*' formats ' (%b%u%c)'
-zstyle ':vcs_info:git:*' actionformats ' (%b|%a%u%c)'
-zstyle ':vcs_info:git:*' check-for-changes true
-zstyle ':vcs_info:git:*' unstagedstr '!'
-zstyle ':vcs_info:git:*' stagedstr '+'
-setopt PROMPT_SUBST
-PROMPT='%F{cyan}%~%f%F{yellow}''${vcs_info_msg_0_}%f %(?.%F{green}❯%f.%F{red}❯%f) '
+      autoload -Uz vcs_info add-zsh-hook
+      precmd() { vcs_info }
+    zstyle ':vcs_info:git:*' formats ' (%b%u%c)'
+      zstyle ':vcs_info:git:*' actionformats ' (%b|%a%u%c)'
+      zstyle ':vcs_info:git:*' check-for-changes true
+      zstyle ':vcs_info:git:*' unstagedstr '!'
+      zstyle ':vcs_info:git:*' stagedstr '+'
+      setopt PROMPT_SUBST
+      PROMPT='%F{cyan}%~%f%F{yellow}''${vcs_info_msg_0_}%f %(?.%F{green}❯%f.%F{red}❯%f) '
 
 # Auto-rename tmux session to current directory basename on cd
-function _tmux_rename_session() {
-  [[ -n "$TMUX" ]] && tmux rename-session "$(basename "$PWD")" 2>/dev/null
-}
-add-zsh-hook chpwd _tmux_rename_session
-_tmux_rename_session
+      function _tmux_rename_session() {
+        [[ -n "$TMUX" ]] && tmux rename-session "$(basename "$PWD")" 2>/dev/null
+      }
+    add-zsh-hook chpwd _tmux_rename_session
+      _tmux_rename_session
       '';
 
   };
@@ -141,8 +144,47 @@ _tmux_rename_session
     };
   }; 
 
+  programs.vscode = {
+    enable = true;
+    package = pkgs.vscode; # csdevkit doesn't support vscodium
+      profiles.default = {
+        userSettings = {
+          "dotnetAcquisitionExtension.existingDotnetPath" = [
+          {
+            "extensionId" = "ms-dotnettools.csharp";
+            "path" = "${pkgs.dotnet-sdk_9}/bin";
+          }
+          {
+            "extensionId" = "ms-dotnettools.csdevkit";
+            "path" = "${pkgs.dotnet-sdk_9}/bin";
+          }
+          {
+            "extensionId" = "woberg.godot-dotnet-tools";
+            "path" = "${pkgs.dotnet-sdk_8}/bin"; # godot-mono uses .NET 8
+          }
+          ];
+          "godotTools.lsp.serverPort" = 6005;
+            "godotTools.editorPath.godot4" = "${pkgs.godot-mono}/bin/godot4-mono";
 
-  programs.kvmux.enable = true;
+        };
+        extensions = with pkgs.vscode-extensions; [
+          geequlim.godot-tools
+            woberg.godot-dotnet-tools
+            ms-dotnettools.csdevkit
+            ms-dotnettools.csharp
+            ms-dotnettools.vscode-dotnet-runtime
+        ] ++ pkgs.vscode-utils.extensionsFromVscodeMarketplace [
+        {
+          name = "godot-files";
+          publisher = "alfish";
+          version = "0.1.6";
+          sha256 = "sha256-FFtl1QXSa4nGKFUJh5f3R7AV7hZg59Qs5vBZHgSUCUw=";
+        }
+        ];
+      };
+  };
+
+  # programs.kvmux.enable = true;
 
   programs.govista.enable = true;
 

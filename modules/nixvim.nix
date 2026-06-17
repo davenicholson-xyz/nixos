@@ -25,12 +25,12 @@
 
     globals.mapleader = " ";
 
-    diagnostics = {
-      virtual_text = true;   # inline messages at end of line
-      signs = true;          # gutter signs (✗ !)
-      underline = true;      # squiggly underlines
-      update_in_insert = false;  # only show after leaving insert mode
-    };
+    # diagnostic = {
+    #   virtual_text = true;   # inline messages at end of line
+    #   signs = true;          # gutter signs (✗ !)
+    #   underline = true;      # squiggly underlines
+    #   update_in_insert = false;  # only show after leaving insert mode
+    # };
 
     plugins = {
       lualine.enable = true;
@@ -43,7 +43,7 @@
       vim-surround.enable = true;
       neo-tree = {
         enable = true;
-        settingss = {
+        settings = {
           close_if_last_window = true;
           filesystem = {
             follow_current_file = {
@@ -53,21 +53,21 @@
           };
         };
       };
-      treesitter = {
-        treesitter.enable = true;
-        grammarPackages = with pkgs.vimPlugins.nvim-treesitter.builtGrammars; [
-          bash
-          json
-          lua
-          nix
-          regex
-          toml
-          vim
-          xml
-          yaml
-          go
-        ];
-      };
+      # treesitter = {
+      #   treesitter.enable = true;
+      #   grammarPackages = with pkgs.vimPlugins.nvim-treesitter.builtGrammars; [
+      #     bash
+      #     json
+      #     lua
+      #     nix
+      #     regex
+      #     toml
+      #     vim
+      #     xml
+      #     yaml
+      #     go
+      #   ];
+      # };
       lsp = {
         enable = true;
         servers = {
